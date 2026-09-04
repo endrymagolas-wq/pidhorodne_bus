@@ -1,0 +1,1050 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Розклад: Підгородне ↔ Тернопіль</title>
+  <meta name="theme-color" content="#0b0f19">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Автобуси">
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🚌</text></svg>">
+  <style>
+    :root {
+      --bg: #0b0f19;
+      --card-bg: #151d30;
+      --card-border: #24304f;
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+      --accent: #38bdf8;
+      --accent-glow: rgba(56, 189, 248, 0.25);
+      --success: #22c55e;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --purple: #a855f7;
+      --gold: #eab308;
+      --blue: #3b82f6;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      padding: env(safe-area-inset-top, 16px) 16px calc(env(safe-area-inset-bottom, 20px) + 70px) 16px;
+      line-height: 1.4;
+      overflow-x: hidden;
+    }
+
+    .container {
+      max-width: 520px;
+      margin: 0 auto;
+    }
+
+    /* Header */
+    header {
+      padding: 12px 0 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .title-group h1 {
+      font-size: 20px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .title-group p {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    .live-clock-badge {
+      background: rgba(56, 189, 248, 0.12);
+      border: 1px solid rgba(56, 189, 248, 0.3);
+      padding: 6px 12px;
+      border-radius: 20px;
+      text-align: right;
+    }
+
+    .live-clock-badge .time {
+      font-size: 16px;
+      font-weight: 700;
+      color: #38bdf8;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .live-clock-badge .label {
+      font-size: 10px;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      letter-spacing: 0.5px;
+    }
+
+    /* Direction Switcher */
+    .direction-switch {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      background: #1e293b;
+      padding: 4px;
+      border-radius: 14px;
+      margin-bottom: 14px;
+      border: 1px solid var(--card-border);
+      position: relative;
+    }
+
+    .dir-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      padding: 10px 8px;
+      font-size: 13px;
+      font-weight: 600;
+      border-radius: 10px;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
+      transition: all 0.2s ease;
+    }
+
+    .dir-btn .dir-title {
+      font-weight: 700;
+      font-size: 13px;
+      color: #cbd5e1;
+    }
+
+    .dir-btn .dir-stop {
+      font-size: 11px;
+      opacity: 0.8;
+    }
+
+    .dir-btn.active {
+      background: linear-gradient(135deg, #0284c7, #0369a1);
+      color: #ffffff;
+      box-shadow: 0 4px 12px rgba(2, 132, 199, 0.35);
+    }
+
+    .dir-btn.active .dir-title {
+      color: #ffffff;
+    }
+
+    /* Hero Next Bus Card */
+    .hero-card {
+      background: linear-gradient(145deg, #1e293b, #0f172a);
+      border: 1.5px solid #38bdf8;
+      border-radius: 18px;
+      padding: 18px;
+      margin-bottom: 16px;
+      box-shadow: 0 8px 24px var(--accent-glow);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-card::before {
+      content: "";
+      position: absolute;
+      top: -30px;
+      right: -30px;
+      width: 100px;
+      height: 100px;
+      background: radial-gradient(circle, rgba(56, 189, 248, 0.2), transparent 70%);
+      border-radius: 50%;
+    }
+
+    .hero-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      color: #38bdf8;
+      margin-bottom: 8px;
+    }
+
+    .hero-tag .pulse {
+      width: 8px;
+      height: 8px;
+      background-color: #38bdf8;
+      border-radius: 50%;
+      box-shadow: 0 0 8px #38bdf8;
+      animation: pulse-anim 1.5s infinite;
+    }
+
+    @keyframes pulse-anim {
+      0% { transform: scale(0.95); opacity: 0.8; }
+      50% { transform: scale(1.3); opacity: 1; }
+      100% { transform: scale(0.95); opacity: 0.8; }
+    }
+
+    .hero-main {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 10px;
+    }
+
+    .hero-time {
+      font-size: 38px;
+      font-weight: 800;
+      letter-spacing: -1px;
+      color: #ffffff;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .hero-countdown {
+      text-align: right;
+    }
+
+    .countdown-pill {
+      background: #22c55e;
+      color: #052e16;
+      font-size: 14px;
+      font-weight: 800;
+      padding: 4px 10px;
+      border-radius: 12px;
+      display: inline-block;
+    }
+
+    .hero-route {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 12px;
+    }
+
+    .route-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 9px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .route-pidg { background: rgba(34, 197, 94, 0.18); color: #4ade80; border: 1px solid rgba(34, 197, 94, 0.4); }
+    .route-drag { background: rgba(59, 130, 246, 0.18); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.4); }
+    .route-zab { background: rgba(234, 179, 8, 0.18); color: #facc15; border: 1px solid rgba(234, 179, 8, 0.4); }
+    .route-dom { background: rgba(168, 85, 247, 0.18); color: #c084fc; border: 1px solid rgba(168, 85, 247, 0.4); }
+    .route-40 { background: rgba(239, 68, 68, 0.18); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.4); }
+
+    .hero-details {
+      background: rgba(0, 0, 0, 0.25);
+      border-radius: 12px;
+      padding: 10px 12px;
+      font-size: 12.5px;
+      color: #cbd5e1;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .hero-details-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .hero-next-preview {
+      margin-top: 10px;
+      font-size: 12px;
+      color: var(--text-muted);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-top: 1px dashed rgba(255, 255, 255, 0.1);
+      padding-top: 8px;
+    }
+
+    /* Alert Banner for #40 */
+    .warning-banner {
+      background: rgba(239, 68, 68, 0.12);
+      border: 1px solid rgba(239, 68, 68, 0.35);
+      border-radius: 14px;
+      padding: 10px 14px;
+      font-size: 12px;
+      color: #fca5a5;
+      margin-bottom: 14px;
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      line-height: 1.35;
+    }
+
+    .warning-banner .icon {
+      font-size: 18px;
+      flex-shrink: 0;
+    }
+
+    /* Filter Bar */
+    .filter-bar {
+      display: flex;
+      gap: 6px;
+      overflow-x: auto;
+      padding-bottom: 8px;
+      margin-bottom: 12px;
+      scrollbar-width: none;
+    }
+
+    .filter-bar::-webkit-scrollbar {
+      display: none;
+    }
+
+    .filter-chip {
+      background: #1e293b;
+      color: var(--text-muted);
+      border: 1px solid var(--card-border);
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      white-space: nowrap;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .filter-chip.active {
+      background: #38bdf8;
+      color: #0f172a;
+      font-weight: 700;
+      border-color: #38bdf8;
+    }
+
+    /* Section Headers */
+    .period-title {
+      font-size: 13px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.7px;
+      color: var(--text-muted);
+      margin: 18px 0 8px 4px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* Schedule List */
+    .schedule-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .bus-item {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 14px;
+      padding: 12px 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: all 0.2s ease;
+    }
+
+    .bus-item.past {
+      opacity: 0.38;
+      filter: grayscale(0.5);
+    }
+
+    .bus-item.highlight {
+      border: 1.5px solid #38bdf8;
+      background: #1a243d;
+      box-shadow: 0 0 14px rgba(56, 189, 248, 0.2);
+    }
+
+    .bus-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .bus-time-block {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .bus-main-time {
+      font-size: 20px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .bus-sub-time {
+      font-size: 11px;
+      color: #38bdf8;
+      font-weight: 600;
+    }
+
+    .bus-right {
+      text-align: right;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 4px;
+    }
+
+    .bus-subinfo {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    .warning-text {
+      color: #f87171;
+      font-size: 10.5px;
+      font-weight: 600;
+    }
+
+    /* Bottom Floating Bar */
+    .bottom-bar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: rgba(11, 15, 25, 0.92);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      padding: 10px 16px calc(env(safe-area-inset-bottom, 12px) + 6px);
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      z-index: 100;
+    }
+
+    .action-btn {
+      background: #1e293b;
+      color: #f8fafc;
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 8px 14px;
+      font-size: 12.5px;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      text-decoration: none;
+      transition: background 0.15s;
+    }
+
+    .action-btn:hover {
+      background: #334155;
+    }
+
+    /* Modal / Bottom Sheet for info */
+    .modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(4px);
+      z-index: 200;
+      align-items: flex-end;
+      justify-content: center;
+    }
+
+    .modal.active {
+      display: flex;
+    }
+
+    .modal-content {
+      background: #151d30;
+      border-top: 1px solid var(--card-border);
+      border-radius: 20px 20px 0 0;
+      padding: 20px 18px calc(env(safe-area-inset-bottom, 20px) + 16px);
+      max-width: 520px;
+      width: 100%;
+      max-height: 85vh;
+      overflow-y: auto;
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+    }
+
+    .modal-title {
+      font-size: 17px;
+      font-weight: 800;
+    }
+
+    .modal-close {
+      background: #1e293b;
+      border: none;
+      color: #fff;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    .modal-body p {
+      font-size: 13.5px;
+      color: #cbd5e1;
+      margin-bottom: 10px;
+      line-height: 1.5;
+    }
+
+    .modal-body ul {
+      margin-left: 20px;
+      margin-bottom: 14px;
+      color: #cbd5e1;
+      font-size: 13px;
+    }
+
+    .modal-body li {
+      margin-bottom: 6px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <!-- Header -->
+  <header>
+    <div class="title-group">
+      <h1>🚌 Підгородне ↔ Тернопіль</h1>
+      <p>Зупинки: McDonald's (Мазепи) • Нижня (село)</p>
+    </div>
+    <div class="live-clock-badge">
+      <div class="time" id="live-clock">--:--:--</div>
+      <div class="label">Київський час</div>
+    </div>
+  </header>
+
+  <!-- Direction Switcher -->
+  <div class="direction-switch">
+    <button class="dir-btn active" id="btn-dir-to-pidg" onclick="setDirection('to-pidg')">
+      <span class="dir-title">🍔 З Тернополя</span>
+      <span class="dir-stop">посадка: McDonald's</span>
+    </button>
+    <button class="dir-btn" id="btn-dir-to-tern" onclick="setDirection('to-tern')">
+      <span class="dir-title">🏡 З Підгородного</span>
+      <span class="dir-stop">посадка: Нижня зупинка</span>
+    </button>
+  </div>
+
+  <!-- Warning Banner for #40 -->
+  <div class="warning-banner" id="warning-40">
+    <div class="icon">⚠️</div>
+    <div>
+      <strong>Підказка для Уляни:</strong> Автобус <strong>№40</strong> їде через Центр та повз McDonald's, але повертає на <strong>Міське кладовище</strong>! Він не їде до Нижньої зупинки в селі. Якщо треба на Нижню — сідай на <strong>🟢 Підг, 🔵 Драг, 🟡 Заб</strong> або <strong>🟣 Дом</strong>.
+    </div>
+  </div>
+
+  <!-- Hero Card: Next Bus Right Now -->
+  <div class="hero-card" id="hero-card">
+    <div class="hero-tag">
+      <div class="pulse"></div>
+      <span id="hero-label">НАЙБЛИЖЧИЙ АВТОБУС ЗАРАЗ</span>
+    </div>
+    <div class="hero-main">
+      <div class="hero-time" id="hero-time">--:--</div>
+      <div class="hero-countdown">
+        <span class="countdown-pill" id="hero-countdown">завантаження...</span>
+      </div>
+    </div>
+    <div class="hero-route" id="hero-route">
+      <span class="route-pill route-pidg">🟢 [Підг]</span>
+      <span>Підгородне (пряма)</span>
+    </div>
+    <div class="hero-details" id="hero-details">
+      <div class="hero-details-row">
+        <span>📍 Посадка на McDonald's:</span>
+        <strong id="hero-stop-time" style="color: #38bdf8;">~--:--</strong>
+      </div>
+      <div class="hero-details-row">
+        <span>🏁 Прибуття на Нижню:</span>
+        <strong id="hero-dest-time">~--:--</strong>
+      </div>
+    </div>
+    <div class="hero-next-preview" id="hero-next-preview">
+      <span>Наступний рейс:</span>
+      <strong id="hero-following">--:--</strong>
+    </div>
+  </div>
+
+  <!-- Filters -->
+  <div class="filter-bar">
+    <button class="filter-chip active" onclick="setFilter('all', this)">Всі маршрути</button>
+    <button class="filter-chip" onclick="setFilter('direct', this)">✨ Без №40 (на Нижню)</button>
+    <button class="filter-chip" onclick="setFilter('pidg', this)">🟢 Підгородне</button>
+    <button class="filter-chip" onclick="setFilter('drag', this)">🔵 Драганівка</button>
+    <button class="filter-chip" onclick="setFilter('zab', this)">🟡 Забойки</button>
+    <button class="filter-chip" onclick="setFilter('dom', this)">🟣 Домаморич</button>
+  </div>
+
+  <!-- Schedule List -->
+  <div id="schedule-container">
+    <!-- Rendered dynamically -->
+  </div>
+</div>
+
+<!-- Bottom Navigation Bar -->
+<div class="bottom-bar">
+  <button class="action-btn" onclick="openModal('info-modal')">ℹ️ Довідка зупинок</button>
+  <button class="action-btn" onclick="openModal('install-modal')">📱 На екран телефону</button>
+</div>
+
+<!-- Modal Info -->
+<div class="modal" id="info-modal" onclick="closeModalOnBackdrop(event, 'info-modal')">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3 class="modal-title">📍 Як їздять автобуси</h3>
+      <button class="modal-close" onclick="closeModal('info-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <p><strong>🍔 Зупинка біля McDonald's (Тернопіль):</strong></p>
+      <ul>
+        <li>Приміські автобуси (Підгородне, Драганівка, Забойки, Домаморич) стартують з <strong>АС-2 (вул. Білогірська)</strong>.</li>
+        <li>Повз McDonald's (вул. Мазепи / Майдан Перемоги) вони проїжджають орієнтовно через <strong>5–7 хвилин</strong> після виїзду з АС-2.</li>
+        <li>До Нижньої зупинки в селі автобус їде ще близько 10–12 хв (разом 15–20 хв від АС-2).</li>
+      </ul>
+      <p><strong>🏡 Нижня зупинка (Підгородне):</strong></p>
+      <ul>
+        <li>Час у розкладі «Підгородне ➔ Тернопіль» вказаний як орієнтовний час посадки в селі на центральній дорозі.</li>
+        <li>До McDonald's у Тернополі автобус доїжджає за <strong>10–12 хвилин</strong>.</li>
+      </ul>
+      <p><strong>🔴 Чому з №40 треба бути обережною:</strong></p>
+      <ul>
+        <li>Маршрут №40 — це міський автобус до кладовища. Він повертає перед селом і <strong>не доїжджає</strong> до Нижньої зупинки.</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Install -->
+<div class="modal" id="install-modal" onclick="closeModalOnBackdrop(event, 'install-modal')">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3 class="modal-title">📲 Як зберегти на телефон</h3>
+      <button class="modal-close" onclick="closeModal('install-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <p><strong>На iPhone (Safari):</strong></p>
+      <ul>
+        <li>Натисни кнопку <strong>«Поділитися»</strong> (квадрат зі стрілкою внизу екрана).</li>
+        <li>Прокрути вниз і обери <strong>«На екран "Додому"» (Add to Home Screen)</strong>.</li>
+        <li>Тепер додаток відкриватиметься миттєво як іконка і працюватиме навіть без інтернету!</li>
+      </ul>
+      <p><strong>На Android (Chrome):</strong></p>
+      <ul>
+        <li>Натисни три крапки у правому верхньому куті.</li>
+        <li>Обери <strong>«Встановити додаток»</strong> або <strong>«Додати на головний екран»</strong>.</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<script>
+// Data definition
+const routes = {
+  pidg: { code: 'Підг', name: 'Підгородне (пряма)', icon: '🟢', class: 'route-pidg', isDirect: true },
+  drag: { code: 'Драг', name: 'Драганівка / Почапинці', icon: '🔵', class: 'route-drag', isDirect: true },
+  zab:  { code: 'Заб',  name: 'Забойки', icon: '🟡', class: 'route-zab', isDirect: true },
+  dom:  { code: 'Дом',  name: 'Домаморич', icon: '🟣', class: 'route-dom', isDirect: true },
+  40:   { code: '№40',  name: 'Автобус №40 (Кладовище)', icon: '🔴', class: 'route-40', isDirect: false }
+};
+
+// Direction 1: Ternopil -> Pidhorodne (Departure from AS-2 / Center)
+const scheduleToPidg = [
+  // Morning
+  { time: "06:30", type: "drag" },
+  { time: "06:40", type: "pidg" },
+  { time: "06:45", type: "zab" },
+  { time: "07:10", type: "drag" },
+  { time: "07:25", type: "dom" },
+  { time: "07:45", type: "pidg" },
+  { time: "07:50", type: "drag" },
+  { time: "08:15", type: "zab" },
+  { time: "08:40", type: "pidg" },
+  { time: "08:40", type: "drag" },
+  { time: "09:10", type: "40" },
+  { time: "09:30", type: "drag" },
+  { time: "09:40", type: "zab" },
+  { time: "10:10", type: "40" },
+  { time: "10:15", type: "pidg" },
+  { time: "10:30", type: "drag" },
+  { time: "11:10", type: "40" },
+  { time: "11:30", type: "zab" },
+  { time: "11:45", type: "drag" },
+  { time: "11:55", type: "dom" },
+  // Day
+  { time: "12:00", type: "pidg" },
+  { time: "12:10", type: "40" },
+  { time: "13:00", type: "drag" },
+  { time: "13:45", type: "pidg" },
+  { time: "14:00", type: "zab" },
+  { time: "14:10", type: "40" },
+  { time: "14:15", type: "drag" },
+  { time: "14:55", type: "dom" },
+  { time: "15:10", type: "pidg" },
+  { time: "15:10", type: "40" },
+  { time: "15:30", type: "drag" },
+  { time: "15:45", type: "zab" },
+  { time: "16:10", type: "40" },
+  // Evening
+  { time: "16:30", type: "drag" },
+  { time: "16:40", type: "pidg" },
+  { time: "17:10", type: "40" },
+  { time: "17:30", type: "drag" },
+  { time: "17:45", type: "zab" },
+  { time: "17:55", type: "dom" },
+  { time: "18:00", type: "pidg" },
+  { time: "18:30", type: "drag" },
+  { time: "19:20", type: "pidg" },
+  { time: "19:30", type: "zab" },
+  { time: "19:30", type: "drag" },
+  { time: "20:15", type: "drag" }
+];
+
+// Direction 2: Pidhorodne -> Ternopil (Boarding in village / Cemetery for #40)
+const scheduleToTern = [
+  // Morning
+  { time: "07:00", type: "drag" },
+  { time: "07:05", type: "pidg" },
+  { time: "07:20", type: "zab" },
+  { time: "07:40", type: "drag" },
+  { time: "08:05", type: "dom" },
+  { time: "08:10", type: "pidg" },
+  { time: "08:20", type: "drag" },
+  { time: "08:50", type: "zab" },
+  { time: "09:10", type: "pidg" },
+  { time: "09:10", type: "drag" },
+  { time: "09:40", type: "40" },
+  { time: "10:00", type: "drag" },
+  { time: "10:15", type: "zab" },
+  { time: "10:40", type: "40" },
+  { time: "10:45", type: "pidg" },
+  { time: "11:00", type: "drag" },
+  { time: "11:40", type: "40" },
+  // Day
+  { time: "12:05", type: "zab" },
+  { time: "12:15", type: "drag" },
+  { time: "12:30", type: "pidg" },
+  { time: "12:35", type: "dom" },
+  { time: "12:40", type: "40" },
+  { time: "13:30", type: "drag" },
+  { time: "14:15", type: "pidg" },
+  { time: "14:35", type: "zab" },
+  { time: "14:40", type: "40" },
+  { time: "14:45", type: "drag" },
+  { time: "15:35", type: "dom" },
+  { time: "15:40", type: "pidg" },
+  { time: "15:40", type: "40" },
+  { time: "15:50", type: "drag" },
+  { time: "16:20", type: "zab" },
+  { time: "16:40", type: "40" },
+  // Evening
+  { time: "16:50", type: "drag" },
+  { time: "17:10", type: "pidg" },
+  { time: "17:40", type: "40" },
+  { time: "17:50", type: "drag" },
+  { time: "18:20", type: "zab" },
+  { time: "18:30", type: "pidg" },
+  { time: "18:35", type: "dom" },
+  { time: "18:50", type: "drag" },
+  { time: "19:45", type: "pidg" },
+  { time: "19:50", type: "drag" },
+  { time: "20:05", type: "zab" }
+];
+
+let currentDirection = 'to-pidg';
+let currentFilter = 'all';
+
+function timeToMinutes(timeStr) {
+  const [h, m] = timeStr.split(':').map(Number);
+  return h * 60 + m;
+}
+
+function minutesToTime(totalMin) {
+  const mod = (totalMin % (24 * 60) + (24 * 60)) % (24 * 60);
+  const h = Math.floor(mod / 60);
+  const m = mod % 60;
+  return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+}
+
+function getMcDonaldsTime(bus, dir) {
+  const depMin = timeToMinutes(bus.time);
+  if (dir === 'to-pidg') {
+    const offset = bus.type === '40' ? 8 : 6;
+    return minutesToTime(depMin + offset);
+  } else {
+    return minutesToTime(depMin + 11);
+  }
+}
+
+function getDestTime(bus, dir) {
+  const depMin = timeToMinutes(bus.time);
+  if (dir === 'to-pidg') {
+    return minutesToTime(depMin + 18);
+  } else {
+    return minutesToTime(depMin + 16);
+  }
+}
+
+function setDirection(dir) {
+  currentDirection = dir;
+  document.getElementById('btn-dir-to-pidg').classList.toggle('active', dir === 'to-pidg');
+  document.getElementById('btn-dir-to-tern').classList.toggle('active', dir === 'to-tern');
+  
+  const warningEl = document.getElementById('warning-40');
+  if (dir === 'to-pidg') {
+    warningEl.innerHTML = `
+      <div class="icon">⚠️</div>
+      <div>
+        <strong>Підказка для Уляни:</strong> Автобус <strong>№40</strong> їде через Центр та повз McDonald's, але повертає на <strong>Міське кладовище</strong>! Він не їде до Нижньої зупинки в селі. Якщо треба на Нижню — сідай на <strong>🟢 Підг, 🔵 Драг, 🟡 Заб</strong> або <strong>🟣 Дом</strong>.
+      </div>
+    `;
+  } else {
+    warningEl.innerHTML = `
+      <div class="icon">💡</div>
+      <div>
+        <strong>Посадка в Підгородньому:</strong> Час у списку — це орієнтовний проїзд Нижньої зупинки. До зупинки <strong>McDonald's</strong> у Тернополі автобус доїжджає за <strong>10–12 хвилин</strong>.
+      </div>
+    `;
+  }
+  
+  updateAll();
+}
+
+function setFilter(filter, el) {
+  currentFilter = filter;
+  document.querySelectorAll('.filter-chip').forEach(btn => btn.classList.remove('active'));
+  if (el) el.classList.add('active');
+  renderSchedule();
+}
+
+function updateClock() {
+  const now = new Date();
+  const timeString = now.toLocaleTimeString('uk-UA', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
+  document.getElementById('live-clock').textContent = timeString;
+}
+
+function getActiveList() {
+  const rawList = currentDirection === 'to-pidg' ? scheduleToPidg : scheduleToTern;
+  if (currentFilter === 'all') return rawList;
+  if (currentFilter === 'direct') return rawList.filter(b => b.type !== '40');
+  return rawList.filter(b => b.type === currentFilter);
+}
+
+function findNextBuses() {
+  const now = new Date();
+  const currentMinutes = now.getHours() * 60 + now.getMinutes();
+  const activeList = getActiveList();
+
+  let nextBus = null;
+  let followingBus = null;
+
+  for (let i = 0; i < activeList.length; i++) {
+    const busMin = timeToMinutes(activeList[i].time);
+    if (busMin >= currentMinutes) {
+      nextBus = activeList[i];
+      followingBus = activeList[i + 1] || null;
+      break;
+    }
+  }
+
+  let isTomorrow = false;
+  if (!nextBus && activeList.length > 0) {
+    nextBus = activeList[0];
+    followingBus = activeList[1] || null;
+    isTomorrow = true;
+  }
+
+  return { nextBus, followingBus, isTomorrow, currentMinutes };
+}
+
+function updateHero() {
+  const { nextBus, followingBus, isTomorrow, currentMinutes } = findNextBuses();
+  if (!nextBus) return;
+
+  const routeInfo = routes[nextBus.type];
+  const busMin = timeToMinutes(nextBus.time);
+  
+  let diffMin = isTomorrow ? (1440 - currentMinutes + busMin) : (busMin - currentMinutes);
+  
+  const heroTimeEl = document.getElementById('hero-time');
+  const heroCountdownEl = document.getElementById('hero-countdown');
+  const heroRouteEl = document.getElementById('hero-route');
+  const heroDetailsEl = document.getElementById('hero-details');
+  const heroFollowingEl = document.getElementById('hero-following');
+  const heroLabelEl = document.getElementById('hero-label');
+
+  heroTimeEl.textContent = nextBus.time;
+  heroLabelEl.textContent = isTomorrow ? "ПЕРШИЙ АВТОБУС ЗАВТРА ВРАНЦІ" : "НАЙБЛИЖЧИЙ АВТОБУС ЗАРАЗ";
+
+  if (diffMin === 0) {
+    heroCountdownEl.textContent = "ЗАРАЗ НА ЗУПИНЦІ!";
+    heroCountdownEl.style.background = "#ef4444";
+    heroCountdownEl.style.color = "#fff";
+  } else if (diffMin < 60) {
+    heroCountdownEl.textContent = `через ${diffMin} хв`;
+    heroCountdownEl.style.background = diffMin <= 10 ? "#f59e0b" : "#22c55e";
+    heroCountdownEl.style.color = diffMin <= 10 ? "#000" : "#052e16";
+  } else {
+    const hours = Math.floor(diffMin / 60);
+    const mins = diffMin % 60;
+    heroCountdownEl.textContent = `через ${hours} год ${mins} хв`;
+    heroCountdownEl.style.background = "#38bdf8";
+    heroCountdownEl.style.color = "#0f172a";
+  }
+
+  heroRouteEl.innerHTML = `
+    <span class="route-pill ${routeInfo.class}">${routeInfo.icon} [${routeInfo.code}]</span>
+    <span>${routeInfo.name}</span>
+  `;
+
+  const mcDonaldsTime = getMcDonaldsTime(nextBus, currentDirection);
+  const destTime = getDestTime(nextBus, currentDirection);
+
+  if (currentDirection === 'to-pidg') {
+    heroDetailsEl.innerHTML = `
+      <div class="hero-details-row">
+        <span>📍 Посадка на McDonald's:</span>
+        <strong style="color: #38bdf8; font-size: 14px;">~${mcDonaldsTime}</strong>
+      </div>
+      <div class="hero-details-row">
+        <span>🏁 Прибуття на Нижню зупинку:</span>
+        <strong>~${destTime}</strong>
+      </div>
+      ${nextBus.type === '40' ? '<div style="color: #fca5a5; font-size: 11px; margin-top: 4px;">⚠️ Увага: їде тільки до кладовища, не на Нижню!</div>' : ''}
+    `;
+  } else {
+    heroDetailsEl.innerHTML = `
+      <div class="hero-details-row">
+        <span>📍 Посадка на Нижній зупинці:</span>
+        <strong style="color: #38bdf8; font-size: 14px;">${nextBus.time}</strong>
+      </div>
+      <div class="hero-details-row">
+        <span>🏁 Прибуття на McDonald's:</span>
+        <strong>~${mcDonaldsTime}</strong>
+      </div>
+    `;
+  }
+
+  if (followingBus) {
+    const nextRoute = routes[followingBus.type];
+    heroFollowingEl.innerHTML = `${followingBus.time} <span class="route-pill ${nextRoute.class}" style="padding: 2px 6px; font-size: 11px;">${nextRoute.icon} ${nextRoute.code}</span>`;
+  } else {
+    heroFollowingEl.textContent = "—";
+  }
+}
+
+function renderSchedule() {
+  const container = document.getElementById('schedule-container');
+  const activeList = getActiveList();
+  const { nextBus, isTomorrow, currentMinutes } = findNextBuses();
+
+  const periods = [
+    { name: "🌅 Ранок (до 12:00)", items: [] },
+    { name: "☀️ День (12:00 - 16:29)", items: [] },
+    { name: "🌆 Вечір (після 16:30)", items: [] }
+  ];
+
+  activeList.forEach(bus => {
+    const min = timeToMinutes(bus.time);
+    if (min < 720) {
+      periods[0].items.push(bus);
+    } else if (min < 990) {
+      periods[1].items.push(bus);
+    } else {
+      periods[2].items.push(bus);
+    }
+  });
+
+  let html = '';
+
+  periods.forEach(p => {
+    if (p.items.length === 0) return;
+
+    html += `<div class="period-title">${p.name}</div><div class="schedule-list">`;
+
+    p.items.forEach(bus => {
+      const route = routes[bus.type];
+      const busMin = timeToMinutes(bus.time);
+      const isPast = !isTomorrow && busMin < currentMinutes;
+      const isNext = nextBus && bus.time === nextBus.time && bus.type === nextBus.type && !isPast;
+      
+      const mcDonaldsTime = getMcDonaldsTime(bus, currentDirection);
+
+      html += `
+        <div class="bus-item ${isPast ? 'past' : ''} ${isNext ? 'highlight' : ''}">
+          <div class="bus-left">
+            <div class="bus-time-block">
+              <span class="bus-main-time">${bus.time}</span>
+              <span class="bus-sub-time">
+                ${currentDirection === 'to-pidg' ? `~${mcDonaldsTime} МакДональдз` : `~${mcDonaldsTime} в Тернополі`}
+              </span>
+            </div>
+            <div>
+              <span class="route-pill ${route.class}">${route.icon} [${route.code}]</span>
+            </div>
+          </div>
+          <div class="bus-right">
+            <span style="font-size: 13px; font-weight: 600;">${route.name.split(' (')[0]}</span>
+            ${bus.type === '40' ? '<span class="warning-text">⚠️ Тільки до кладовища</span>' : '<span class="bus-subinfo">Через Нижню зупинку</span>'}
+          </div>
+        </div>
+      `;
+    });
+
+    html += `</div>`;
+  });
+
+  container.innerHTML = html;
+}
+
+function updateAll() {
+  updateClock();
+  updateHero();
+  renderSchedule();
+}
+
+function openModal(id) {
+  document.getElementById(id).classList.add('active');
+}
+
+function closeModal(id) {
+  document.getElementById(id).classList.remove('active');
+}
+
+function closeModalOnBackdrop(e, id) {
+  if (e.target.id === id) closeModal(id);
+}
+
+setInterval(updateClock, 1000);
+setInterval(() => {
+  updateHero();
+  renderSchedule();
+}, 20000);
+
+updateAll();
+</script>
+
+</body>
+</html>
