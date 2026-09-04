@@ -15,11 +15,27 @@ except Exception:
     # Fallback to UTC+2/UTC+3
     KYIV_TZ = timezone(timedelta(hours=3))
 
+try:
+    import urllib3.fields
+    if not hasattr(urllib3.fields, 'format_header_param'):
+        urllib3.fields.format_header_param = getattr(
+            urllib3.fields, 'format_header_param_rfc2231',
+            lambda name, value: f'{name}="{value}"'
+        )
+except Exception:
+    pass
+
 import telebot
 from telebot import types
+try:
+    from dotenv import load_dotenv
+    load_dotenv()
+except ImportError:
+    pass
 
-# ТОКЕН БОТА: вставте сюди свій токен від @BotFather або задайте через змінну оточення TG_BOT_TOKEN
-TOKEN = os.getenv("TG_BOT_TOKEN", "YOUR_TELEGRAM_BOT_TOKEN_HERE")
+
+# ТОКЕН БОТА (з .env або за замовчуванням)
+TOKEN = os.getenv("TG_BOT_TOKEN", "8972553566:AAEvFKwONSaYRHdFvNa_oGxqBw1K29kQBmg")
 
 bot = telebot.TeleBot(TOKEN)
 
