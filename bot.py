@@ -74,26 +74,38 @@ def minutes_to_str(m: int) -> str:
 def get_kyiv_now() -> datetime:
     return datetime.now(KYIV_TZ)
 
+WEBAPP_URL = os.getenv("WEBAPP_URL", "")  # наприклад, https://yoursite.com/bus
+
 def build_main_keyboard():
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=2)
     btn_mcd = types.KeyboardButton("🍔 Від McDonald's (зараз)")
     btn_pidg = types.KeyboardButton("🏡 З Нижньої (зараз)")
     btn_all_to_pidg = types.KeyboardButton("📅 Розклад: Тернопіль ➔ Село")
     btn_all_to_tern = types.KeyboardButton("📅 Розклад: Село ➔ Тернопіль")
+    btn_img = types.KeyboardButton("🖼️ Фото розкладу та PDF")
     btn_warn = types.KeyboardButton("⚠️ Важливо про №40")
     markup.add(btn_mcd, btn_pidg)
     markup.add(btn_all_to_pidg, btn_all_to_tern)
-    markup.add(btn_warn)
+    markup.add(btn_img, btn_warn)
     return markup
 
 @bot.message_handler(commands=['start', 'help'])
 def send_welcome(message):
     text = (
         "🚌 <b>Розклад автобусів: Підгородне ↔ Тернопіль</b>\n"
-        "Спеціально налаштовано під зупинки: <b>McDonald's (Мазепи)</b> та <b>Нижня зупинка (село)</b>.\n\n"
-        "Оберіть дію в меню нижче 👇"
+        "Спеціально для Уляни під зупинки: <b>McDonald's (Мазепи)</b> та <b>Нижня зупинка (село)</b>.\n\n"
+        "Натискай кнопки нижче, щоб миттєво дізнатися наступний автобус 👇"
     )
+    # Якщо є WebApp URL, додаємо інлайн-кнопку
+    inline_markup = None
+    if WEBAPP_URL:
+        inline_markup = types.InlineKeyboardMarkup()
+        inline_markup.add(types.InlineKeyboardButton("📲 Відкрити інтерактивний додаток", web_app=types.WebAppInfo(url=WEBAPP_URL)))
+    
     bot.send_message(message.chat.id, text, parse_mode="HTML", reply_markup=build_main_keyboard())
+    if inline_markup:
+        bot.send_message(message.chat.id, "Також можна відкрити живий таймер:", reply_markup=inline_markup)
+
 
 @bot.message_handler(func=lambda m: m.text == "🍔 Від McDonald's (зараз)")
 def next_from_mcd(message):
@@ -243,6 +255,31 @@ def info_warning(message):
         "💡 <i>Всі ці приміські автобуси виїжджають з АС-2 (Білогірська) і їдуть через вул. Мазепи прямо повз McDonald's (+5–7 хв після старту).</i>"
     )
     bot.send_message(message.chat.id, text, parse_mode="HTML")
+
+@bot.message_handler(func=lambda m: m.text == "🖼️ Фото розкладу та PDF")
+def send_files(message):
+    bot.send_message(message.chat.id, "Надсилаю зручні фото розкладу та PDF...")
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    p1 = os.path.join(base_dir, "ternopil_to_pidhorodne_mobile.png")
+    p2 = os.path.join(base_dir, "pidhorodne_to_ternopil_mobile.png")
+    p_all = os.path.join(base_dir, "rozklad_all_in_one.png")
+    pdf_file = os.path.join(base_dir, "rozklad_pidhorodne_ternopil.pdf")
+
+    if os.path.exists(p_all):
+        with open(p_all, 'rb') as f:
+            bot.send_photo(message.chat.id, f, caption="📋 <b>Зведений розклад</b> (обидва напрямки)", parse_mode="HTML")
+
+    if os.path.exists(p1):
+        with open(p1, 'rb') as f:
+            bot.send_photo(message.chat.id, f, caption="🍔 <b>Тернопіль ➔ Підгородне</b> (McDonald's ➔ Нижня зупинка)", parse_mode="HTML")
+
+    if os.path.exists(p2):
+        with open(p2, 'rb') as f:
+            bot.send_photo(message.chat.id, f, caption="🏡 <b>Підгородне ➔ Тернопіль</b> (Нижня зупинка ➔ McDonald's)", parse_mode="HTML")
+
+    if os.path.exists(pdf_file):
+        with open(pdf_file, 'rb') as f:
+            bot.send_document(message.chat.id, f, caption="📑 <b>Розклад у PDF</b> (можна зберегти у Файли)", parse_mode="HTML")
 
 if __name__ == "__main__":
     print("Bot is starting...")
