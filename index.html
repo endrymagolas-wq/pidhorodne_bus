@@ -38,505 +38,214 @@
       --radius: 12px;
     }
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      -webkit-tap-highlight-color: transparent;
-    }
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
-      background-color: var(--bg);
-      color: var(--text);
+      background: var(--bg); color: var(--text);
       min-height: 100vh;
       padding: env(safe-area-inset-top, 16px) 16px calc(env(safe-area-inset-bottom, 20px) + 64px) 16px;
-      line-height: 1.5;
-      overflow-x: hidden;
-      -webkit-font-smoothing: antialiased;
+      line-height: 1.5; overflow-x: hidden; -webkit-font-smoothing: antialiased;
     }
 
-    .container {
-      max-width: 480px;
-      margin: 0 auto;
-    }
+    .container { max-width: 480px; margin: 0 auto; }
 
     /* ── Header ── */
     header {
       padding: 14px 0 18px;
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
+      display: flex; justify-content: space-between; align-items: flex-start;
     }
-
-    .title-group h1 {
-      font-size: 19px;
-      font-weight: 700;
-      letter-spacing: -0.3px;
-      color: var(--text);
-    }
-
-    .title-group p {
-      font-size: 13px;
-      color: var(--text-secondary);
-      margin-top: 3px;
-    }
-
+    .title-group h1 { font-size: 19px; font-weight: 700; letter-spacing: -0.3px; }
+    .title-group p { font-size: 13px; color: var(--text-secondary); margin-top: 3px; }
     .clock {
-      font-size: 15px;
-      font-weight: 600;
-      color: var(--text-secondary);
-      font-variant-numeric: tabular-nums;
-      padding-top: 2px;
+      font-size: 15px; font-weight: 600; color: var(--text-secondary);
+      font-variant-numeric: tabular-nums; padding-top: 2px;
     }
 
     /* ── Direction Tabs ── */
-    .dir-tabs {
-      display: flex;
-      gap: 8px;
-      margin-bottom: 16px;
-    }
-
+    .dir-tabs { display: flex; gap: 8px; margin-bottom: 12px; }
     .dir-tab {
-      flex: 1;
-      background: var(--surface);
-      border: 1.5px solid var(--border);
-      border-radius: var(--radius);
-      padding: 10px 12px;
-      cursor: pointer;
-      transition: border-color 0.15s, background 0.15s;
-      text-align: center;
+      flex: 1; background: var(--surface); border: 1.5px solid var(--border);
+      border-radius: var(--radius); padding: 10px 12px; cursor: pointer;
+      transition: border-color 0.15s, background 0.15s; text-align: center;
     }
+    .dir-tab .dir-label { font-size: 14px; font-weight: 600; color: var(--text-secondary); display: block; }
+    .dir-tab .dir-sub { font-size: 11.5px; color: var(--text-tertiary); margin-top: 2px; display: block; }
+    .dir-tab.active { border-color: var(--accent); background: var(--accent-soft); }
+    .dir-tab.active .dir-label { color: var(--accent); }
+    .dir-tab.active .dir-sub { color: var(--text-secondary); }
 
-    .dir-tab .dir-label {
-      font-size: 14px;
-      font-weight: 600;
-      color: var(--text-secondary);
-      display: block;
+    /* ── Stop Selector ── */
+    .stop-section { margin-bottom: 14px; }
+    .stop-label {
+      font-size: 11.5px; font-weight: 600; color: var(--text-tertiary);
+      margin-bottom: 6px; padding-left: 2px;
     }
-
-    .dir-tab .dir-sub {
-      font-size: 11.5px;
-      color: var(--text-tertiary);
-      margin-top: 2px;
-      display: block;
+    .stop-row {
+      display: flex; gap: 6px; overflow-x: auto;
+      padding-bottom: 4px; scrollbar-width: none;
     }
-
-    .dir-tab.active {
-      border-color: var(--accent);
-      background: var(--accent-soft);
+    .stop-row::-webkit-scrollbar { display: none; }
+    .stop-chip {
+      background: var(--surface); color: var(--text-secondary);
+      border: 1.5px solid var(--border); padding: 6px 11px;
+      border-radius: 10px; font-size: 12px; font-weight: 500;
+      white-space: nowrap; cursor: pointer; transition: all 0.15s;
+      display: flex; flex-direction: column; align-items: center; gap: 1px;
+      min-width: fit-content;
     }
-
-    .dir-tab.active .dir-label {
-      color: var(--accent);
+    .stop-chip .stop-name { font-weight: 600; font-size: 12.5px; }
+    .stop-chip .stop-sub { font-size: 10px; color: var(--text-tertiary); }
+    .stop-chip.active {
+      background: var(--accent-soft); color: var(--accent);
+      border-color: var(--accent); font-weight: 600;
     }
-
-    .dir-tab.active .dir-sub {
-      color: var(--text-secondary);
-    }
+    .stop-chip.active .stop-sub { color: var(--text-secondary); }
 
     /* ── Next Bus Card ── */
     .next-card {
-      background: var(--surface);
-      border: 1.5px solid var(--border);
-      border-radius: var(--radius);
-      padding: 16px;
-      margin-bottom: 14px;
+      background: var(--surface); border: 1.5px solid var(--border);
+      border-radius: var(--radius); padding: 16px; margin-bottom: 14px;
     }
-
-    .next-card-header {
-      font-size: 11.5px;
-      font-weight: 600;
-      color: var(--text-tertiary);
-      margin-bottom: 10px;
-    }
-
+    .next-card-header { font-size: 11.5px; font-weight: 600; color: var(--text-tertiary); margin-bottom: 10px; }
     .next-card-main {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 12px;
+      display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;
     }
-
     .next-card-time {
-      font-size: 36px;
-      font-weight: 700;
-      letter-spacing: -1px;
-      color: var(--text);
-      font-variant-numeric: tabular-nums;
-      line-height: 1;
+      font-size: 36px; font-weight: 700; letter-spacing: -1px;
+      color: var(--text); font-variant-numeric: tabular-nums; line-height: 1;
     }
-
     .countdown-badge {
-      font-size: 14px;
-      font-weight: 700;
-      padding: 5px 12px;
-      border-radius: 20px;
-      line-height: 1;
+      font-size: 14px; font-weight: 700; padding: 5px 12px;
+      border-radius: 20px; line-height: 1;
     }
-
-    .countdown-soon {
-      background: var(--green-soft);
-      color: var(--green);
-    }
-
-    .countdown-urgent {
-      background: rgba(201, 113, 113, 0.18);
-      color: var(--red);
-    }
-
-    .countdown-far {
-      background: var(--accent-soft);
-      color: var(--accent);
-    }
+    .cd-soon { background: var(--green-soft); color: var(--green); }
+    .cd-urgent { background: var(--red-soft); color: var(--red); }
+    .cd-far { background: var(--accent-soft); color: var(--accent); }
 
     .next-card-route {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 14px;
-      font-weight: 600;
-      margin-bottom: 12px;
-      color: var(--text);
+      display: flex; align-items: center; gap: 8px;
+      font-size: 14px; font-weight: 600; margin-bottom: 12px;
     }
-
     .next-card-details {
-      background: var(--surface-raised);
-      border-radius: 8px;
-      padding: 10px 12px;
-      font-size: 13px;
-      color: var(--text-secondary);
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
+      background: var(--surface-raised); border-radius: 8px;
+      padding: 10px 12px; font-size: 13px; color: var(--text-secondary);
+      display: flex; flex-direction: column; gap: 6px;
     }
-
-    .detail-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .detail-row strong {
-      color: var(--text);
-      font-weight: 600;
-    }
-
+    .detail-row { display: flex; justify-content: space-between; align-items: center; }
+    .detail-row strong { color: var(--text); font-weight: 600; }
     .next-card-footer {
-      margin-top: 10px;
-      padding-top: 10px;
-      border-top: 1px solid var(--border);
-      font-size: 12.5px;
-      color: var(--text-tertiary);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
+      margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border);
+      font-size: 12.5px; color: var(--text-tertiary);
+      display: flex; justify-content: space-between; align-items: center;
     }
-
-    .next-card-footer strong {
-      color: var(--text-secondary);
-    }
-
-    /* ── Warning/Info Banner ── */
-    .info-banner {
-      background: var(--surface);
-      border: 1.5px solid var(--border);
-      border-radius: var(--radius);
-      padding: 10px 14px;
-      font-size: 12.5px;
-      color: var(--text-secondary);
-      margin-bottom: 14px;
-      display: flex;
-      align-items: flex-start;
-      gap: 8px;
-      line-height: 1.45;
-    }
-
-    .info-banner.warn {
-      border-color: rgba(201, 113, 113, 0.35);
-    }
-
-    .info-banner .banner-icon {
-      font-size: 16px;
-      flex-shrink: 0;
-      line-height: 1.3;
-    }
-
-    .info-banner strong {
-      color: var(--text);
-    }
+    .next-card-footer strong { color: var(--text-secondary); }
 
     /* ── Filter Chips ── */
     .filters {
-      display: flex;
-      gap: 6px;
-      overflow-x: auto;
-      padding-bottom: 6px;
-      margin-bottom: 14px;
-      scrollbar-width: none;
+      display: flex; gap: 6px; overflow-x: auto;
+      padding-bottom: 6px; margin-bottom: 14px; scrollbar-width: none;
     }
-
-    .filters::-webkit-scrollbar {
-      display: none;
-    }
-
+    .filters::-webkit-scrollbar { display: none; }
     .chip {
-      background: var(--surface);
-      color: var(--text-secondary);
-      border: 1.5px solid var(--border);
-      padding: 6px 12px;
-      border-radius: 20px;
-      font-size: 12.5px;
-      font-weight: 500;
-      white-space: nowrap;
-      cursor: pointer;
-      transition: all 0.15s;
+      background: var(--surface); color: var(--text-secondary);
+      border: 1.5px solid var(--border); padding: 6px 12px;
+      border-radius: 20px; font-size: 12.5px; font-weight: 500;
+      white-space: nowrap; cursor: pointer; transition: all 0.15s;
     }
-
     .chip.active {
-      background: var(--accent-soft);
-      color: var(--accent);
-      border-color: var(--accent);
-      font-weight: 600;
+      background: var(--accent-soft); color: var(--accent);
+      border-color: var(--accent); font-weight: 600;
     }
 
     /* ── Period Labels ── */
-    .period-label {
-      font-size: 12.5px;
-      font-weight: 600;
-      color: var(--text-tertiary);
-      margin: 20px 0 8px 2px;
-    }
+    .period-label { font-size: 12.5px; font-weight: 600; color: var(--text-tertiary); margin: 20px 0 8px 2px; }
 
     /* ── Bus List ── */
-    .bus-list {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-    }
-
+    .bus-list { display: flex; flex-direction: column; gap: 6px; }
     .bus-row {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 11px 14px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 10px; padding: 11px 14px;
+      display: flex; justify-content: space-between; align-items: center;
       transition: opacity 0.15s;
     }
-
-    .bus-row.past {
-      opacity: 0.3;
-    }
-
-    .bus-row.current {
-      border-color: var(--accent);
-      background: var(--accent-soft);
-    }
-
-    .bus-left {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .bus-time-col {
-      display: flex;
-      flex-direction: column;
-    }
-
+    .bus-row.past { opacity: 0.3; }
+    .bus-row.current { border-color: var(--accent); background: var(--accent-soft); }
+    .bus-left { display: flex; align-items: center; gap: 12px; }
+    .bus-time-col { display: flex; flex-direction: column; }
     .bus-time {
-      font-size: 18px;
-      font-weight: 700;
-      font-variant-numeric: tabular-nums;
-      color: var(--text);
-      letter-spacing: -0.3px;
+      font-size: 18px; font-weight: 700; font-variant-numeric: tabular-nums;
+      color: var(--text); letter-spacing: -0.3px;
     }
-
-    .bus-mctime {
-      font-size: 11px;
-      color: var(--accent);
-      font-weight: 500;
-    }
-
-    .bus-right {
-      text-align: right;
-      display: flex;
-      flex-direction: column;
-      align-items: flex-end;
-      gap: 2px;
-    }
-
-    .bus-route-name {
-      font-size: 12.5px;
-      font-weight: 500;
-      color: var(--text-secondary);
-    }
-
-    .bus-warning {
-      color: var(--red);
-      font-size: 10.5px;
-      font-weight: 500;
-    }
-
-    .bus-note {
-      font-size: 10.5px;
-      color: var(--text-tertiary);
-    }
+    .bus-subtime { font-size: 11px; color: var(--accent); font-weight: 500; }
+    .bus-right { text-align: right; display: flex; flex-direction: column; align-items: flex-end; gap: 2px; }
+    .bus-route-name { font-size: 12.5px; font-weight: 500; color: var(--text-secondary); }
+    .bus-note { font-size: 10.5px; color: var(--text-tertiary); }
 
     /* ── Route Pills ── */
     .pill {
-      display: inline-flex;
-      align-items: center;
-      gap: 3px;
-      padding: 3px 8px;
-      border-radius: 6px;
-      font-size: 12px;
-      font-weight: 600;
-      line-height: 1;
+      display: inline-flex; align-items: center; gap: 3px;
+      padding: 3px 8px; border-radius: 6px; font-size: 12px; font-weight: 600; line-height: 1;
     }
-
-    .pill-sm {
-      padding: 2px 6px;
-      font-size: 11px;
-    }
-
+    .pill-sm { padding: 2px 6px; font-size: 11px; }
     .pill-pidg { background: var(--green-soft); color: var(--green); }
     .pill-drag { background: var(--blue-soft); color: var(--blue); }
     .pill-zab { background: var(--yellow-soft); color: var(--yellow); }
     .pill-dom { background: var(--purple-soft); color: var(--purple); }
-    .pill-40 { background: var(--red-soft); color: var(--red); }
 
     /* ── Bottom Bar ── */
     .bottom-bar {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      background: rgba(26, 26, 26, 0.94);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      border-top: 1px solid var(--border);
+      position: fixed; bottom: 0; left: 0; right: 0;
+      background: rgba(26, 26, 26, 0.94); backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px); border-top: 1px solid var(--border);
       padding: 8px 16px calc(env(safe-area-inset-bottom, 10px) + 4px);
-      display: flex;
-      justify-content: center;
-      gap: 8px;
-      z-index: 100;
+      display: flex; justify-content: center; gap: 8px; z-index: 100;
     }
-
     .bar-btn {
-      background: var(--surface);
-      color: var(--text-secondary);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 8px 14px;
-      font-size: 12.5px;
-      font-weight: 500;
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      cursor: pointer;
-      text-decoration: none;
-      transition: background 0.15s;
+      background: var(--surface); color: var(--text-secondary);
+      border: 1px solid var(--border); border-radius: 10px;
+      padding: 8px 14px; font-size: 12.5px; font-weight: 500;
+      display: inline-flex; align-items: center; gap: 5px;
+      cursor: pointer; text-decoration: none; transition: background 0.15s;
     }
-
-    .bar-btn:active {
-      background: var(--surface-raised);
-    }
-
-    .bar-btn.danger {
-      color: var(--red);
-      border-color: rgba(201, 113, 113, 0.3);
-    }
+    .bar-btn:active { background: var(--surface-raised); }
+    .bar-btn.danger { color: var(--red); border-color: rgba(201, 113, 113, 0.3); }
 
     /* ── Modal ── */
     .modal-overlay {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(0, 0, 0, 0.6);
-      backdrop-filter: blur(3px);
-      z-index: 200;
-      align-items: flex-end;
-      justify-content: center;
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,0.6); backdrop-filter: blur(3px);
+      z-index: 200; align-items: flex-end; justify-content: center;
     }
-
-    .modal-overlay.open {
-      display: flex;
-    }
-
+    .modal-overlay.open { display: flex; }
     .modal-sheet {
-      background: var(--surface);
-      border-top: 1px solid var(--border);
+      background: var(--surface); border-top: 1px solid var(--border);
       border-radius: 16px 16px 0 0;
       padding: 18px 18px calc(env(safe-area-inset-bottom, 20px) + 14px);
-      max-width: 480px;
-      width: 100%;
-      max-height: 80vh;
-      overflow-y: auto;
+      max-width: 480px; width: 100%; max-height: 80vh; overflow-y: auto;
     }
-
-    .modal-top {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 14px;
-    }
-
-    .modal-top h3 {
-      font-size: 16px;
-      font-weight: 700;
-    }
-
+    .modal-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+    .modal-top h3 { font-size: 16px; font-weight: 700; }
     .modal-x {
-      background: var(--surface-raised);
-      border: none;
-      color: var(--text-secondary);
-      width: 28px;
-      height: 28px;
-      border-radius: 50%;
-      font-size: 15px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      background: var(--surface-raised); border: none; color: var(--text-secondary);
+      width: 28px; height: 28px; border-radius: 50%; font-size: 15px;
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
     }
+    .modal-body p { font-size: 13.5px; color: var(--text-secondary); margin-bottom: 10px; line-height: 1.5; }
+    .modal-body ul { margin-left: 18px; margin-bottom: 14px; color: var(--text-secondary); font-size: 13px; }
+    .modal-body li { margin-bottom: 6px; }
+    .modal-body strong { color: var(--text); }
 
-    .modal-body p {
-      font-size: 13.5px;
-      color: var(--text-secondary);
-      margin-bottom: 10px;
-      line-height: 1.5;
-    }
-
-    .modal-body ul {
-      margin-left: 18px;
-      margin-bottom: 14px;
-      color: var(--text-secondary);
-      font-size: 13px;
-    }
-
-    .modal-body li {
-      margin-bottom: 6px;
-    }
-
-    .modal-body strong {
-      color: var(--text);
-    }
-
-    /* ── Scrollbar ── */
     ::-webkit-scrollbar { width: 0; height: 0; }
   </style>
 </head>
 <body>
 
 <div class="container">
-  <!-- Header -->
   <header>
     <div class="title-group">
       <h1>🚌 Підгородне ↔ Тернопіль</h1>
-      <p>McDonald's (Мазепи) • Нижня (село)</p>
+      <p id="header-sub">Розклад приміських автобусів</p>
     </div>
     <div class="clock" id="live-clock">--:--</div>
   </header>
@@ -544,21 +253,19 @@
   <!-- Direction Tabs -->
   <div class="dir-tabs">
     <button class="dir-tab active" id="btn-dir-to-pidg" onclick="setDirection('to-pidg')">
-      <span class="dir-label">🍔 З Тернополя</span>
-      <span class="dir-sub">посадка: McDonald's</span>
+      <span class="dir-label">🏙️ З Тернополя</span>
+      <span class="dir-sub" id="dir-sub-to-pidg">→ Підгородне</span>
     </button>
     <button class="dir-tab" id="btn-dir-to-tern" onclick="setDirection('to-tern')">
       <span class="dir-label">🏡 З Підгородного</span>
-      <span class="dir-sub">посадка: Нижня зупинка</span>
+      <span class="dir-sub" id="dir-sub-to-tern">→ Тернопіль</span>
     </button>
   </div>
 
-  <!-- Warning Banner -->
-  <div class="info-banner warn" id="warning-40">
-    <span class="banner-icon">⚠️</span>
-    <div>
-      <strong>Для Уляни:</strong> Автобус <strong>№40</strong> їде через Центр та повз McDonald's, але повертає на <strong>Міське кладовище</strong>! Він не їде до Нижньої зупинки в селі. На Нижню — сідай на <strong>🟢 Підг, 🔵 Драг, 🟡 Заб</strong> або <strong>🟣 Дом</strong>.
-    </div>
+  <!-- Stop Selector -->
+  <div class="stop-section">
+    <div class="stop-label">📍 Де ти сідаєш:</div>
+    <div class="stop-row" id="stop-row"></div>
   </div>
 
   <!-- Next Bus Card -->
@@ -566,23 +273,14 @@
     <div class="next-card-header" id="hero-label">Найближчий автобус</div>
     <div class="next-card-main">
       <div class="next-card-time" id="hero-time">--:--</div>
-      <span class="countdown-badge countdown-soon" id="hero-countdown">завантаження...</span>
+      <span class="countdown-badge cd-soon" id="hero-countdown">...</span>
     </div>
     <div class="next-card-route" id="hero-route">
       <span class="pill pill-pidg">🟢 Підг</span>
-      <span>Підгородне (пряма)</span>
+      <span>Підгородне</span>
     </div>
-    <div class="next-card-details" id="hero-details">
-      <div class="detail-row">
-        <span>📍 Посадка McDonald's:</span>
-        <strong id="hero-stop-time">~--:--</strong>
-      </div>
-      <div class="detail-row">
-        <span>🏁 Прибуття на Нижню:</span>
-        <strong id="hero-dest-time">~--:--</strong>
-      </div>
-    </div>
-    <div class="next-card-footer" id="hero-next-preview">
+    <div class="next-card-details" id="hero-details"></div>
+    <div class="next-card-footer" id="hero-footer">
       <span>Наступний:</span>
       <strong id="hero-following">--:--</strong>
     </div>
@@ -591,7 +289,6 @@
   <!-- Filters -->
   <div class="filters">
     <button class="chip active" onclick="setFilter('all', this)">Всі</button>
-    <button class="chip" onclick="setFilter('direct', this)">Без №40</button>
     <button class="chip" onclick="setFilter('pidg', this)">🟢 Підг</button>
     <button class="chip" onclick="setFilter('drag', this)">🔵 Драг</button>
     <button class="chip" onclick="setFilter('zab', this)">🟡 Заб</button>
@@ -617,20 +314,23 @@
       <button class="modal-x" onclick="closeModal('info-modal')">✕</button>
     </div>
     <div class="modal-body">
-      <p><strong>🍔 Зупинка біля McDonald's (Тернопіль):</strong></p>
+      <p><strong>Маршрут по місту (з Тернополя):</strong></p>
       <ul>
-        <li>Приміські автобуси стартують з <strong>АС-2 (вул. Білогірська)</strong>.</li>
-        <li>Повз McDonald's (вул. Мазепи) вони проїжджають через <strong>5–7 хвилин</strong> після виїзду з АС-2.</li>
-        <li>До Нижньої зупинки в селі — ще 10–12 хв (разом 15–20 хв від АС-2).</li>
+        <li><strong>АС-2</strong> (вул. Білогірська) → <strong>Збруч</strong> (вул. Торговиця) → <strong>Дамба</strong> → <strong>McDonald's / Танк</strong> (вул. Мазепи) → <strong>Бережанська</strong> (ЗУНУ) → виїзд на трасу E50 → <strong>Підгородне</strong></li>
       </ul>
-      <p><strong>🏡 Нижня зупинка (Підгородне):</strong></p>
+      <p><strong>Зупинки в селі:</strong></p>
       <ul>
-        <li>Час у розкладі «З Підгородного» — орієнтовний проїзд Нижньої зупинки.</li>
-        <li>До McDonald's у Тернополі — <strong>10–12 хвилин</strong>.</li>
+        <li><strong>Верхня зупинка</strong> — поворот з траси E50 у село.</li>
+        <li><strong>Нижня зупинка</strong> — центральна частина села, основна житлова лінія.</li>
       </ul>
-      <p><strong>🔴 Чому з №40 треба бути обережною:</strong></p>
+      <p><strong>Час у дорозі:</strong></p>
       <ul>
-        <li>Маршрут №40 — міський автобус до кладовища. Повертає перед селом і <strong>не доїжджає</strong> до Нижньої зупинки.</li>
+        <li>АС-2 → Нижня: <strong>~17 хвилин</strong></li>
+        <li>Нижня → АС-2: <strong>~20 хвилин</strong></li>
+      </ul>
+      <p><strong>⚠️ Автобус №40 (кладовище):</strong></p>
+      <ul>
+        <li>Міський маршрут №40 курсує від Кооперативного коледжу до <strong>Міського кладовища</strong> на околиці. Він <strong>не доїжджає</strong> до Нижньої зупинки (>2,5 км пішки). Тому №40 <strong>не включений</strong> у цей розклад.</li>
       </ul>
     </div>
   </div>
@@ -659,186 +359,172 @@
 </div>
 
 <script>
+// ── Route definitions ──
 const routes = {
-  pidg: { code: 'Підг', name: 'Підгородне (пряма)', icon: '🟢', pill: 'pill-pidg', isDirect: true },
-  drag: { code: 'Драг', name: 'Драганівка / Почапинці', icon: '🔵', pill: 'pill-drag', isDirect: true },
-  zab:  { code: 'Заб',  name: 'Забойки', icon: '🟡', pill: 'pill-zab', isDirect: true },
-  dom:  { code: 'Дом',  name: 'Домаморич', icon: '🟣', pill: 'pill-dom', isDirect: true },
-  40:   { code: '№40',  name: 'Автобус №40 (Кладовище)', icon: '🔴', pill: 'pill-40', isDirect: false }
+  pidg: { code: 'Підг', name: 'Підгородне', icon: '🟢', pill: 'pill-pidg' },
+  drag: { code: 'Драг', name: 'Драганівка', icon: '🔵', pill: 'pill-drag' },
+  zab:  { code: 'Заб',  name: 'Забойки',    icon: '🟡', pill: 'pill-zab' },
+  dom:  { code: 'Дом',  name: 'Домаморич',  icon: '🟣', pill: 'pill-dom' }
 };
 
+// ── Stop configurations ──
+// Offsets are minutes from base departure time (АС-2 for to-pidg, Нижня for to-tern)
+const stopsConfig = {
+  'to-pidg': [
+    { id: 'as2',         name: 'АС-2',         sub: 'вул. Білогірська',    offset: 0 },
+    { id: 'zbruch',      name: 'Збруч',         sub: 'вул. Торговиця',     offset: 2 },
+    { id: 'halychyna',   name: 'Галичина',      sub: 'Дамба / вул. Руська', offset: 4, approx: true },
+    { id: 'mcdonalds',   name: "McDonald's",    sub: 'Танк / вул. Мазепи', offset: 6 },
+    { id: 'berezhanska', name: 'Бережанська',   sub: 'ЗУНУ / виїзд',      offset: 8 },
+    { id: 'verhnya',     name: 'Верхня зуп.',   sub: 'Поворот / E50',      offset: 13, approx: true },
+    { id: 'nizhnya',     name: 'Нижня зуп.',    sub: 'Центр села',         offset: 17 },
+  ],
+  'to-tern': [
+    { id: 'nizhnya',     name: 'Нижня зуп.',    sub: 'Центр села',         offset: 0 },
+    { id: 'verhnya',     name: 'Верхня зуп.',   sub: 'Поворот / E50',      offset: 4, approx: true },
+    { id: 'berezhanska', name: 'Бережанська',   sub: 'ЗУНУ',               offset: 9 },
+    { id: 'mcdonalds',   name: "McDonald's",    sub: 'Танк / вул. Мазепи', offset: 11 },
+    { id: 'halychyna',   name: 'Галичина',      sub: 'Дамба / вул. Руська', offset: 14, approx: true },
+    { id: 'zbruch',      name: 'Збруч',         sub: 'вул. Торговиця',     offset: 16 },
+    { id: 'as2',         name: 'АС-2',          sub: 'вул. Білогірська',   offset: 20 },
+  ]
+};
+
+// Destination offsets (for showing arrival at the end of route)
+const destOffset = { 'to-pidg': 17, 'to-tern': 20 };
+const destName = { 'to-pidg': 'Нижня зуп.', 'to-tern': 'АС-2' };
+
+// ── Schedule data (base departure times: АС-2 for to-pidg, Нижня for to-tern) ──
 const scheduleToPidg = [
-  { time: "06:30", type: "drag" },
-  { time: "06:40", type: "pidg" },
-  { time: "06:45", type: "zab" },
-  { time: "07:10", type: "drag" },
-  { time: "07:25", type: "dom" },
-  { time: "07:45", type: "pidg" },
-  { time: "07:50", type: "drag" },
-  { time: "08:15", type: "zab" },
-  { time: "08:40", type: "pidg" },
-  { time: "08:40", type: "drag" },
-  { time: "09:10", type: "40" },
-  { time: "09:30", type: "drag" },
-  { time: "09:40", type: "zab" },
-  { time: "10:10", type: "40" },
-  { time: "10:15", type: "pidg" },
-  { time: "10:30", type: "drag" },
-  { time: "11:10", type: "40" },
-  { time: "11:30", type: "zab" },
-  { time: "11:45", type: "drag" },
-  { time: "11:55", type: "dom" },
-  { time: "12:00", type: "pidg" },
-  { time: "12:10", type: "40" },
-  { time: "13:00", type: "drag" },
-  { time: "13:45", type: "pidg" },
-  { time: "14:00", type: "zab" },
-  { time: "14:10", type: "40" },
-  { time: "14:15", type: "drag" },
-  { time: "14:55", type: "dom" },
-  { time: "15:10", type: "pidg" },
-  { time: "15:10", type: "40" },
-  { time: "15:30", type: "drag" },
-  { time: "15:45", type: "zab" },
-  { time: "16:10", type: "40" },
-  { time: "16:30", type: "drag" },
-  { time: "16:40", type: "pidg" },
-  { time: "17:10", type: "40" },
-  { time: "17:30", type: "drag" },
-  { time: "17:45", type: "zab" },
-  { time: "17:55", type: "dom" },
-  { time: "18:00", type: "pidg" },
-  { time: "18:30", type: "drag" },
-  { time: "19:20", type: "pidg" },
-  { time: "19:30", type: "zab" },
-  { time: "19:30", type: "drag" },
-  { time: "20:15", type: "drag" }
+  {t:"06:30",r:"drag"},{t:"06:40",r:"pidg"},{t:"06:45",r:"zab"},
+  {t:"07:10",r:"drag"},{t:"07:25",r:"dom"},{t:"07:45",r:"pidg"},
+  {t:"07:50",r:"drag"},{t:"08:15",r:"zab"},{t:"08:40",r:"pidg"},
+  {t:"08:40",r:"drag"},{t:"09:30",r:"drag"},{t:"09:40",r:"zab"},
+  {t:"10:15",r:"pidg"},{t:"10:30",r:"drag"},{t:"11:30",r:"zab"},
+  {t:"11:45",r:"drag"},{t:"11:55",r:"dom"},{t:"12:00",r:"pidg"},
+  {t:"13:00",r:"drag"},{t:"13:45",r:"pidg"},{t:"14:00",r:"zab"},
+  {t:"14:15",r:"drag"},{t:"14:55",r:"dom"},{t:"15:10",r:"pidg"},
+  {t:"15:30",r:"drag"},{t:"15:45",r:"zab"},{t:"16:30",r:"drag"},
+  {t:"16:40",r:"pidg"},{t:"17:30",r:"drag"},{t:"17:45",r:"zab"},
+  {t:"17:55",r:"dom"},{t:"18:00",r:"pidg"},{t:"18:30",r:"drag"},
+  {t:"19:20",r:"pidg"},{t:"19:30",r:"zab"},{t:"19:30",r:"drag"},
+  {t:"20:15",r:"drag"}
 ];
 
 const scheduleToTern = [
-  { time: "07:00", type: "drag" },
-  { time: "07:05", type: "pidg" },
-  { time: "07:20", type: "zab" },
-  { time: "07:40", type: "drag" },
-  { time: "08:05", type: "dom" },
-  { time: "08:10", type: "pidg" },
-  { time: "08:20", type: "drag" },
-  { time: "08:50", type: "zab" },
-  { time: "09:10", type: "pidg" },
-  { time: "09:10", type: "drag" },
-  { time: "09:40", type: "40" },
-  { time: "10:00", type: "drag" },
-  { time: "10:15", type: "zab" },
-  { time: "10:40", type: "40" },
-  { time: "10:45", type: "pidg" },
-  { time: "11:00", type: "drag" },
-  { time: "11:40", type: "40" },
-  { time: "12:05", type: "zab" },
-  { time: "12:15", type: "drag" },
-  { time: "12:30", type: "pidg" },
-  { time: "12:35", type: "dom" },
-  { time: "12:40", type: "40" },
-  { time: "13:30", type: "drag" },
-  { time: "14:15", type: "pidg" },
-  { time: "14:35", type: "zab" },
-  { time: "14:40", type: "40" },
-  { time: "14:45", type: "drag" },
-  { time: "15:35", type: "dom" },
-  { time: "15:40", type: "pidg" },
-  { time: "15:40", type: "40" },
-  { time: "15:50", type: "drag" },
-  { time: "16:20", type: "zab" },
-  { time: "16:40", type: "40" },
-  { time: "16:50", type: "drag" },
-  { time: "17:10", type: "pidg" },
-  { time: "17:40", type: "40" },
-  { time: "17:50", type: "drag" },
-  { time: "18:20", type: "zab" },
-  { time: "18:30", type: "pidg" },
-  { time: "18:35", type: "dom" },
-  { time: "18:50", type: "drag" },
-  { time: "19:45", type: "pidg" },
-  { time: "19:50", type: "drag" },
-  { time: "20:05", type: "zab" }
+  {t:"07:00",r:"drag"},{t:"07:05",r:"pidg"},{t:"07:20",r:"zab"},
+  {t:"07:40",r:"drag"},{t:"08:05",r:"dom"},{t:"08:10",r:"pidg"},
+  {t:"08:20",r:"drag"},{t:"08:50",r:"zab"},{t:"09:10",r:"pidg"},
+  {t:"09:10",r:"drag"},{t:"10:00",r:"drag"},{t:"10:15",r:"zab"},
+  {t:"10:45",r:"pidg"},{t:"11:00",r:"drag"},{t:"12:05",r:"zab"},
+  {t:"12:15",r:"drag"},{t:"12:30",r:"pidg"},{t:"12:35",r:"dom"},
+  {t:"13:30",r:"drag"},{t:"14:15",r:"pidg"},{t:"14:35",r:"zab"},
+  {t:"14:45",r:"drag"},{t:"15:35",r:"dom"},{t:"15:40",r:"pidg"},
+  {t:"15:50",r:"drag"},{t:"16:20",r:"zab"},{t:"16:50",r:"drag"},
+  {t:"17:10",r:"pidg"},{t:"17:50",r:"drag"},{t:"18:20",r:"zab"},
+  {t:"18:30",r:"pidg"},{t:"18:35",r:"dom"},{t:"18:50",r:"drag"},
+  {t:"19:45",r:"pidg"},{t:"19:50",r:"drag"},{t:"20:05",r:"zab"}
 ];
 
-let currentDirection = 'to-pidg';
-let currentFilter = 'all';
+// ── State ──
+let curDir = 'to-pidg';
+let curFilter = 'all';
+let selectedStops = { 'to-pidg': 'mcdonalds', 'to-tern': 'nizhnya' };
 
-function toMin(t) {
-  const [h, m] = t.split(':').map(Number);
-  return h * 60 + m;
+// ── Helpers ──
+function toMin(t) { const [h,m] = t.split(':').map(Number); return h*60+m; }
+function toTime(n) { const mod = (n%1440+1440)%1440; return `${String(Math.floor(mod/60)).padStart(2,'0')}:${String(mod%60).padStart(2,'0')}`; }
+
+function getStopOffset() {
+  const stops = stopsConfig[curDir];
+  const sel = selectedStops[curDir];
+  const s = stops.find(s => s.id === sel);
+  return s ? s.offset : 0;
 }
 
-function toTime(n) {
-  const mod = (n % 1440 + 1440) % 1440;
-  return `${String(Math.floor(mod / 60)).padStart(2, '0')}:${String(mod % 60).padStart(2, '0')}`;
+function getStopInfo() {
+  const stops = stopsConfig[curDir];
+  return stops.find(s => s.id === selectedStops[curDir]) || stops[0];
 }
 
-function mcTime(bus, dir) {
-  const d = toMin(bus.time);
-  if (dir === 'to-pidg') return toTime(d + (bus.type === '40' ? 8 : 6));
-  return toTime(d + 11);
+function busTimeAtStop(bus) {
+  return toTime(toMin(bus.t) + getStopOffset());
 }
 
-function destTime(bus, dir) {
-  return toTime(toMin(bus.time) + (dir === 'to-pidg' ? 18 : 16));
+function busTimeAtDest(bus) {
+  return toTime(toMin(bus.t) + destOffset[curDir]);
 }
 
-function setDirection(dir) {
-  currentDirection = dir;
-  document.getElementById('btn-dir-to-pidg').classList.toggle('active', dir === 'to-pidg');
-  document.getElementById('btn-dir-to-tern').classList.toggle('active', dir === 'to-tern');
+function busMinAtStop(bus) {
+  return toMin(bus.t) + getStopOffset();
+}
 
-  const w = document.getElementById('warning-40');
-  if (dir === 'to-pidg') {
-    w.innerHTML = `
-      <span class="banner-icon">⚠️</span>
-      <div>
-        <strong>Для Уляни:</strong> Автобус <strong>№40</strong> їде через Центр та повз McDonald's, але повертає на <strong>Міське кладовище</strong>! Він не їде до Нижньої зупинки в селі. На Нижню — сідай на <strong>🟢 Підг, 🔵 Драг, 🟡 Заб</strong> або <strong>🟣 Дом</strong>.
-      </div>`;
-    w.className = 'info-banner warn';
-  } else {
-    w.innerHTML = `
-      <span class="banner-icon">💡</span>
-      <div>
-        <strong>Посадка в Підгородньому:</strong> Час у списку — орієнтовний проїзд Нижньої зупинки. До <strong>McDonald's</strong> у Тернополі — <strong>10–12 хвилин</strong>.
-      </div>`;
-    w.className = 'info-banner';
-  }
+// ── Stop selector rendering ──
+function renderStops() {
+  const row = document.getElementById('stop-row');
+  const stops = stopsConfig[curDir];
+  const sel = selectedStops[curDir];
+  row.innerHTML = stops.map(s => `
+    <button class="stop-chip ${s.id === sel ? 'active' : ''}" onclick="selectStop('${s.id}')">
+      <span class="stop-name">${s.approx ? '~' : ''}${s.name}</span>
+      <span class="stop-sub">${s.sub}</span>
+    </button>
+  `).join('');
+
+  // Update header sub
+  const si = getStopInfo();
+  document.getElementById('header-sub').textContent = `Посадка: ${si.name} (${si.sub})`;
+}
+
+function selectStop(id) {
+  selectedStops[curDir] = id;
+  renderStops();
   updateAll();
 }
 
+// ── Direction ──
+function setDirection(dir) {
+  curDir = dir;
+  document.getElementById('btn-dir-to-pidg').classList.toggle('active', dir === 'to-pidg');
+  document.getElementById('btn-dir-to-tern').classList.toggle('active', dir === 'to-tern');
+  renderStops();
+  updateAll();
+}
+
+// ── Filter ──
 function setFilter(f, el) {
-  currentFilter = f;
+  curFilter = f;
   document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
   if (el) el.classList.add('active');
   renderSchedule();
 }
 
+// ── Clock ──
 function updateClock() {
   const now = new Date();
   document.getElementById('live-clock').textContent =
-    now.toLocaleTimeString('uk-UA', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
+    now.toLocaleTimeString('uk-UA', { hour:'2-digit', minute:'2-digit', second:'2-digit', hour12:false });
 }
 
+// ── Data ──
 function getList() {
-  const raw = currentDirection === 'to-pidg' ? scheduleToPidg : scheduleToTern;
-  if (currentFilter === 'all') return raw;
-  if (currentFilter === 'direct') return raw.filter(b => b.type !== '40');
-  return raw.filter(b => b.type === currentFilter);
+  const raw = curDir === 'to-pidg' ? scheduleToPidg : scheduleToTern;
+  if (curFilter === 'all') return raw;
+  return raw.filter(b => b.r === curFilter);
 }
 
 function findNext() {
   const now = new Date();
-  const cur = now.getHours() * 60 + now.getMinutes();
+  const cur = now.getHours()*60 + now.getMinutes();
   const list = getList();
+  const offset = getStopOffset();
   let next = null, following = null, tomorrow = false;
 
   for (let i = 0; i < list.length; i++) {
-    if (toMin(list[i].time) >= cur) {
+    const atStop = toMin(list[i].t) + offset;
+    if (atStop >= cur) {
       next = list[i];
-      following = list[i + 1] || null;
+      following = list[i+1] || null;
       break;
     }
   }
@@ -850,61 +536,80 @@ function findNext() {
   return { next, following, tomorrow, cur };
 }
 
+// ── Hero Card ──
 function updateHero() {
   const { next, following, tomorrow, cur } = findNext();
   if (!next) return;
 
-  const r = routes[next.type];
-  const bm = toMin(next.time);
-  let diff = tomorrow ? (1440 - cur + bm) : (bm - cur);
+  const r = routes[next.r];
+  const atStop = busMinAtStop(next);
+  let diff = tomorrow ? (1440 - cur + atStop) : (atStop - cur);
+  const stopInfo = getStopInfo();
 
-  document.getElementById('hero-time').textContent = next.time;
+  document.getElementById('hero-time').textContent = busTimeAtStop(next);
   document.getElementById('hero-label').textContent = tomorrow ? 'Перший автобус завтра' : 'Найближчий автобус';
 
   const cd = document.getElementById('hero-countdown');
   if (diff === 0) {
-    cd.textContent = 'зараз!';
-    cd.className = 'countdown-badge countdown-urgent';
+    cd.textContent = 'зараз!'; cd.className = 'countdown-badge cd-urgent';
   } else if (diff < 60) {
     cd.textContent = `${diff} хв`;
-    cd.className = diff <= 10 ? 'countdown-badge countdown-urgent' : 'countdown-badge countdown-soon';
+    cd.className = diff <= 10 ? 'countdown-badge cd-urgent' : 'countdown-badge cd-soon';
   } else {
-    cd.textContent = `${Math.floor(diff / 60)} год ${diff % 60} хв`;
-    cd.className = 'countdown-badge countdown-far';
+    cd.textContent = `${Math.floor(diff/60)} год ${diff%60} хв`;
+    cd.className = 'countdown-badge cd-far';
   }
 
   document.getElementById('hero-route').innerHTML = `
     <span class="pill ${r.pill}">${r.icon} ${r.code}</span>
     <span>${r.name}</span>`;
 
-  const mc = mcTime(next, currentDirection);
-  const dt = destTime(next, currentDirection);
+  // Details — show key stops along the route
   const details = document.getElementById('hero-details');
+  const stops = stopsConfig[curDir];
+  const baseMin = toMin(next.t);
+  let detailsHtml = '';
 
-  if (currentDirection === 'to-pidg') {
-    details.innerHTML = `
-      <div class="detail-row"><span>📍 McDonald's:</span><strong>~${mc}</strong></div>
-      <div class="detail-row"><span>🏁 Нижня зупинка:</span><strong>~${dt}</strong></div>
-      ${next.type === '40' ? '<div style="color:var(--red);font-size:11px;margin-top:3px">⚠️ Їде тільки до кладовища!</div>' : ''}`;
-  } else {
-    details.innerHTML = `
-      <div class="detail-row"><span>📍 Нижня зупинка:</span><strong>${next.time}</strong></div>
-      <div class="detail-row"><span>🏁 McDonald's:</span><strong>~${mc}</strong></div>`;
-  }
+  // Show 3-4 key stops: boarding stop + 2-3 others
+  const keyStopIds = curDir === 'to-pidg'
+    ? ['as2', 'zbruch', 'mcdonalds', 'berezhanska', 'nizhnya']
+    : ['nizhnya', 'berezhanska', 'mcdonalds', 'zbruch', 'as2'];
 
+  keyStopIds.forEach(sid => {
+    const s = stops.find(x => x.id === sid);
+    if (!s) return;
+    const t = toTime(baseMin + s.offset);
+    const prefix = s.approx ? '~' : '';
+    const isMy = sid === selectedStops[curDir];
+    detailsHtml += `<div class="detail-row">
+      <span>${isMy ? '📍' : '→'} ${s.name}</span>
+      <strong${isMy ? ' style="color:var(--accent)"' : ''}>${prefix}${t}</strong>
+    </div>`;
+  });
+
+  details.innerHTML = detailsHtml;
+
+  // Following bus
   const fp = document.getElementById('hero-following');
   if (following) {
-    const fr = routes[following.type];
-    fp.innerHTML = `${following.time} <span class="pill pill-sm ${fr.pill}">${fr.icon} ${fr.code}</span>`;
+    const fr = routes[following.r];
+    fp.innerHTML = `${busTimeAtStop(following)} <span class="pill pill-sm ${fr.pill}">${fr.icon} ${fr.code}</span>`;
   } else {
     fp.textContent = '—';
   }
 }
 
+// ── Schedule List ──
 function renderSchedule() {
   const container = document.getElementById('schedule-container');
   const list = getList();
   const { next, tomorrow, cur } = findNext();
+  const offset = getStopOffset();
+  const dOff = destOffset[curDir];
+  const dName = destName[curDir];
+  const stopInfo = getStopInfo();
+  const isAtDest = (curDir === 'to-pidg' && stopInfo.id === 'nizhnya') ||
+                   (curDir === 'to-tern' && stopInfo.id === 'as2');
 
   const periods = [
     { label: '🌅 Ранок', items: [] },
@@ -913,7 +618,7 @@ function renderSchedule() {
   ];
 
   list.forEach(b => {
-    const m = toMin(b.time);
+    const m = toMin(b.t) + offset;
     if (m < 720) periods[0].items.push(b);
     else if (m < 990) periods[1].items.push(b);
     else periods[2].items.push(b);
@@ -925,58 +630,65 @@ function renderSchedule() {
     html += `<div class="period-label">${p.label}</div><div class="bus-list">`;
 
     p.items.forEach(b => {
-      const r = routes[b.type];
-      const bm = toMin(b.time);
-      const isPast = !tomorrow && bm < cur;
-      const isCurrent = next && b.time === next.time && b.type === next.type && !isPast;
-      const mc = mcTime(b, currentDirection);
+      const r = routes[b.r];
+      const atStop = toMin(b.t) + offset;
+      const isPast = !tomorrow && atStop < cur;
+      const isCurrent = next && b.t === next.t && b.r === next.r && !isPast;
+      const timeAtStop = busTimeAtStop(b);
+      const timeAtDest = busTimeAtDest(b);
+
+      let subText = '';
+      if (!isAtDest) {
+        subText = `→ ${dName} ~${timeAtDest}`;
+      } else {
+        // If already at destination, show departure point time
+        const startName = curDir === 'to-pidg' ? 'АС-2' : 'Нижня';
+        subText = `з ${startName} ${b.t}`;
+      }
 
       html += `
         <div class="bus-row ${isPast ? 'past' : ''} ${isCurrent ? 'current' : ''}">
           <div class="bus-left">
             <div class="bus-time-col">
-              <span class="bus-time">${b.time}</span>
-              <span class="bus-mctime">${currentDirection === 'to-pidg' ? `~${mc} McDonald's` : `~${mc} Тернопіль`}</span>
+              <span class="bus-time">${timeAtStop}</span>
+              <span class="bus-subtime">${subText}</span>
             </div>
             <span class="pill ${r.pill}">${r.icon} ${r.code}</span>
           </div>
           <div class="bus-right">
-            <span class="bus-route-name">${r.name.split(' (')[0]}</span>
-            ${b.type === '40' ? '<span class="bus-warning">⚠️ До кладовища</span>' : '<span class="bus-note">Через Нижню</span>'}
+            <span class="bus-route-name">${r.name}</span>
           </div>
         </div>`;
     });
-
     html += '</div>';
   });
 
   container.innerHTML = html;
 }
 
-function updateAll() {
-  updateClock();
-  updateHero();
-  renderSchedule();
-}
+// ── Update all ──
+function updateAll() { updateClock(); updateHero(); renderSchedule(); }
 
+// ── Modals ──
 function openModal(id) { document.getElementById(id).classList.add('open'); }
 function closeModal(id) { document.getElementById(id).classList.remove('open'); }
 function closeOnBg(e, id) { if (e.target.id === id) closeModal(id); }
 
-setInterval(updateClock, 1000);
-setInterval(() => { updateHero(); renderSchedule(); }, 20000);
-
+// ── Cache clear ──
 function clearAppCache() {
   if (confirm("Очистити кеш та оновити розклад?")) {
     try {
       if ('caches' in window) caches.keys().then(n => { for (let k of n) caches.delete(k); });
-      localStorage.clear();
-      sessionStorage.clear();
+      localStorage.clear(); sessionStorage.clear();
     } catch(e) {}
     window.location.replace(window.location.origin + window.location.pathname + '?v=' + Date.now());
   }
 }
 
+// ── Init ──
+setInterval(updateClock, 1000);
+setInterval(() => { updateHero(); renderSchedule(); }, 20000);
+renderStops();
 updateAll();
 </script>
 
