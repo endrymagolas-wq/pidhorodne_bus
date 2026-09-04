@@ -8,7 +8,11 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Автобуси">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
   <link rel="manifest" href="manifest.json">
+
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🚌</text></svg>">
   <style>
     :root {
@@ -606,9 +610,11 @@
 
 <!-- Bottom Navigation Bar -->
 <div class="bottom-bar">
-  <button class="action-btn" onclick="openModal('info-modal')">ℹ️ Довідка зупинок</button>
-  <button class="action-btn" onclick="openModal('install-modal')">📱 На екран телефону</button>
+  <button class="action-btn" onclick="openModal('info-modal')">ℹ️ Довідка</button>
+  <button class="action-btn" onclick="openModal('install-modal')">📱 На екран</button>
+  <button class="action-btn" onclick="clearAppCache()" style="color: #f87171; border-color: rgba(239, 68, 68, 0.4);">🧹 Очистити кеш</button>
 </div>
+
 
 <!-- Modal Info -->
 <div class="modal" id="info-modal" onclick="closeModalOnBackdrop(event, 'info-modal')">
@@ -1043,8 +1049,25 @@ setInterval(() => {
   renderSchedule();
 }, 20000);
 
+function clearAppCache() {
+  if (confirm("Очистити збережені дані та завантажити найсвіжіший розклад?")) {
+    try {
+      if ('caches' in window) {
+        caches.keys().then(names => {
+          for (let name of names) caches.delete(name);
+        });
+      }
+      localStorage.clear();
+      sessionStorage.clear();
+    } catch(e) {}
+    const cleanUrl = window.location.origin + window.location.pathname + '?v=' + Date.now();
+    window.location.replace(cleanUrl);
+  }
+}
+
 updateAll();
 </script>
+
 
 </body>
 </html>

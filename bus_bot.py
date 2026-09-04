@@ -97,15 +97,21 @@ def get_kyiv_now() -> datetime:
 
 def build_main_keyboard():
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=2)
+    # Головна велика кнопка для відкриття сайту прямо в Telegram
+    btn_webapp = types.KeyboardButton("🌐 Відкрити онлайн-розклад", web_app=types.WebAppInfo(url=WEBAPP_URL))
     btn_mcd = types.KeyboardButton("🍔 Від McDonald's (зараз)")
     btn_pidg = types.KeyboardButton("🏡 З Нижньої (зараз)")
     btn_all_to_pidg = types.KeyboardButton("📅 Розклад: Тернопіль ➔ Село")
     btn_all_to_tern = types.KeyboardButton("📅 Розклад: Село ➔ Тернопіль")
     btn_img = types.KeyboardButton("🖼️ Фото розкладу та PDF")
+    btn_clean = types.KeyboardButton("🧹 Очистити кеш сайту")
     btn_warn = types.KeyboardButton("⚠️ Важливо про №40")
+    
+    markup.add(btn_webapp)
     markup.add(btn_mcd, btn_pidg)
     markup.add(btn_all_to_pidg, btn_all_to_tern)
-    markup.add(btn_img, btn_warn)
+    markup.add(btn_img, btn_clean)
+    markup.add(btn_warn)
     return markup
 
 @bot.message_handler(commands=['start', 'help'])
@@ -113,15 +119,42 @@ def send_welcome(message):
     text = (
         "🚌 <b>Розклад автобусів: Підгородне ↔ Тернопіль</b>\n"
         "Спеціально для Уляни під зупинки: <b>McDonald's (Мазепи)</b> та <b>Нижня зупинка (село)</b>.\n\n"
-        "Натискай кнопки нижче, щоб миттєво дізнатися наступний автобус 👇"
+        "Натискай кнопки нижче або відкривай повний онлайн-сайт розкладу 👇"
     )
     inline_markup = types.InlineKeyboardMarkup()
-    inline_markup.add(types.InlineKeyboardButton("📲 Відкрити інтерактивний додаток", web_app=types.WebAppInfo(url=WEBAPP_URL)))
+    inline_markup.add(types.InlineKeyboardButton("📲 Відкрити повний сайт (Mini App)", web_app=types.WebAppInfo(url=WEBAPP_URL)))
     
     bot.send_message(message.chat.id, text, parse_mode="HTML", reply_markup=build_main_keyboard())
-    bot.send_message(message.chat.id, "Також можна відкрити живий онлайн-таймер:", reply_markup=inline_markup)
+    bot.send_message(message.chat.id, "✨ Натисни кнопку, щоб відкрити живий онлайн-таймер:", reply_markup=inline_markup)
+
+@bot.message_handler(commands=['site', 'app', 'link'])
+def send_site_link(message):
+    inline_markup = types.InlineKeyboardMarkup()
+    inline_markup.add(types.InlineKeyboardButton("📲 Відкрити онлайн-сайт", web_app=types.WebAppInfo(url=WEBAPP_URL)))
+    text = (
+        f"🌐 <b>Онлайн-сайт розкладу:</b>\n"
+        f"<code>{WEBAPP_URL}</code>\n\n"
+        f"Натисніть кнопку нижче, щоб відкрити його прямо тут у Telegram, або скопіюйте посилання у браузер."
+    )
+    bot.send_message(message.chat.id, text, parse_mode="HTML", reply_markup=inline_markup)
+
+@bot.message_handler(func=lambda m: m.text == "🧹 Очистити кеш сайту" or m.text in ["/clean", "/refresh"])
+def clean_site_cache(message):
+    nocache_time = int(datetime.now().timestamp())
+    clean_url = f"{WEBAPP_URL}?nocache={nocache_time}"
+    inline_markup = types.InlineKeyboardMarkup()
+    inline_markup.add(types.InlineKeyboardButton("🔄 Відкрити свіжий розклад (без кешу)", web_app=types.WebAppInfo(url=clean_url)))
+    
+    text = (
+        "🧹 <b>Очищення кешу сайту:</b>\n\n"
+        "Якщо в телефоні чи в Telegram відображається старий розклад або завис час:\n"
+        "1. Натисніть кнопку нижче <b>«🔄 Відкрити свіжий розклад»</b> — вона відкриє сайт із примусовим оновленням даних.\n"
+        "2. На самому сайті внизу також є червона кнопка <b>«🧹 Очистити кеш»</b>, яка видаляє старі збережені файли з пам'яті браузера."
+    )
+    bot.send_message(message.chat.id, text, parse_mode="HTML", reply_markup=inline_markup)
 
 @bot.message_handler(func=lambda m: m.text == "🍔 Від McDonald's (зараз)")
+
 def next_from_mcd(message):
     now = get_kyiv_now()
     cur_m = now.hour * 60 + now.minute
