@@ -25,7 +25,7 @@ except Exception:
 
 import telebot
 from telebot import types
-from flask import request, Response, jsonify
+from flask import request, Response, jsonify, send_file
 
 # Налаштування проксі для PythonAnywhere
 if "PYTHONANYWHERE_DOMAIN" in os.environ or os.path.exists("/home/AvalonKnight"):
@@ -515,13 +515,46 @@ def register_bus_routes(app):
         return "Помилка: файл index.html не знайдено", 404
 
     @app.route("/manifest.json", methods=["GET"])
+    @app.route("/bus/manifest.json", methods=["GET"])
     def bus_manifest():
         man_path = os.path.join(BASE_DIR, "manifest.json")
         if os.path.exists(man_path):
             with open(man_path, "r", encoding="utf-8") as f:
                 content = f.read()
-            return Response(content, mimetype="application/json; charset=utf-8")
+            resp = Response(content, mimetype="application/manifest+json; charset=utf-8")
+            resp.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
+            return resp
         return "{}", 200
+
+    @app.route("/bus/icon-192.png", methods=["GET"])
+    @app.route("/icon-192.png", methods=["GET"])
+    def bus_icon_192():
+        p = os.path.join(BASE_DIR, "icon-192.png")
+        if os.path.exists(p):
+            resp = send_file(p, mimetype="image/png")
+            resp.headers["Cache-Control"] = "no-cache, must-revalidate"
+            return resp
+        return "", 404
+
+    @app.route("/bus/icon-512.png", methods=["GET"])
+    @app.route("/icon-512.png", methods=["GET"])
+    def bus_icon_512():
+        p = os.path.join(BASE_DIR, "icon-512.png")
+        if os.path.exists(p):
+            resp = send_file(p, mimetype="image/png")
+            resp.headers["Cache-Control"] = "no-cache, must-revalidate"
+            return resp
+        return "", 404
+
+    @app.route("/bus/apple-touch-icon.png", methods=["GET"])
+    @app.route("/apple-touch-icon.png", methods=["GET"])
+    def bus_apple_touch_icon():
+        p = os.path.join(BASE_DIR, "apple-touch-icon.png")
+        if os.path.exists(p):
+            resp = send_file(p, mimetype="image/png")
+            resp.headers["Cache-Control"] = "no-cache, must-revalidate"
+            return resp
+        return "", 404
 
     @app.route("/bus/api/status", methods=["GET"])
     def bus_api_status():
