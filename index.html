@@ -285,29 +285,29 @@
     .drv-prev-title { font-weight: 700; color: var(--text-tertiary); margin-bottom: 4px; font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.5px; }
     .drv-prev-content { color: var(--text); font-weight: 500; }
 
-    /* ── Direction Tabs (iOS 18 Segmented Control Style) ── */
+    /* ── Direction Tabs (iOS 18 & Uber Capsule Segmented Control) ── */
     .dir-tabs {
-      display: flex; gap: 6px; margin-bottom: 14px;
-      background: rgba(18, 24, 38, 0.6); padding: 5px;
-      border-radius: 16px; border: 1px solid var(--border);
+      display: flex; gap: 4px; margin-bottom: 14px;
+      background: rgba(15, 19, 28, 0.75); padding: 4px;
+      border-radius: 9999px; border: 1px solid var(--border);
       box-shadow: 0 4px 16px rgba(0,0,0,0.3);
     }
     .dir-tab {
       flex: 1; background: transparent; border: 1px solid transparent;
-      border-radius: 12px; padding: 9px 10px; cursor: pointer;
-      transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1); text-align: center;
+      border-radius: 9999px; padding: 8px 12px; cursor: pointer;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1); text-align: center;
     }
-    .dir-tab .dir-label { font-size: 13.5px; font-weight: 600; color: var(--text-secondary); display: block; }
+    .dir-tab .dir-label { font-size: 13px; font-weight: 600; color: var(--text-secondary); display: block; }
     .dir-tab .dir-sub { font-size: 11px; color: var(--text-tertiary); margin-top: 1px; display: block; font-weight: 500; }
     .dir-tab.active {
-      border-color: rgba(255, 255, 255, 0.12);
-      background: rgba(255, 255, 255, 0.08);
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+      border-color: rgba(255, 255, 255, 0.14);
+      background: rgba(255, 255, 255, 0.1);
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.15);
     }
-    .dir-tab.active .dir-label { color: var(--text); font-weight: 700; }
-    .dir-tab.active .dir-sub { color: var(--accent); }
+    .dir-tab.active .dir-label { color: #ffffff; font-weight: 700; }
+    .dir-tab.active .dir-sub { color: var(--accent); font-weight: 600; }
 
-    /* ── Stop Selector ── */
+    /* ── Stop Selector (Opal-Style Capsule Chips) ── */
     .stop-section { margin-bottom: 14px; }
     .stop-label {
       font-size: 11px; font-weight: 700; color: var(--text-tertiary);
@@ -319,9 +319,9 @@
     .stop-row::-webkit-scrollbar { display: none; }
     .stop-chip {
       background: var(--surface); color: var(--text-secondary);
-      border: 1px solid var(--border); padding: 7px 12px;
-      border-radius: 12px; font-size: 12px; font-weight: 600;
-      white-space: nowrap; cursor: pointer; transition: all 0.15s;
+      border: 1px solid var(--border); padding: 7px 14px;
+      border-radius: 9999px; font-size: 12px; font-weight: 600;
+      white-space: nowrap; cursor: pointer; transition: all 0.18s;
       display: flex; flex-direction: column; align-items: center; gap: 1px;
       min-width: fit-content; backdrop-filter: var(--glass-blur);
     }
@@ -331,7 +331,7 @@
     .stop-chip.active {
       background: var(--accent-soft); color: var(--accent);
       border-color: var(--accent); font-weight: 700;
-      box-shadow: 0 2px 12px rgba(16, 185, 129, 0.25);
+      box-shadow: 0 2px 14px rgba(16, 185, 129, 0.25);
     }
     .stop-chip.active .stop-sub { color: var(--text-secondary); }
 
@@ -544,26 +544,114 @@
     .pill-zab  { background: var(--yellow-soft); color: var(--yellow); border: 1px solid rgba(245, 158, 11, 0.25); }
     .pill-dom  { background: var(--purple-soft); color: var(--purple); border: 1px solid rgba(168, 85, 247, 0.25); }
 
-    /* ── Bottom Bar (2026 Floating Island Dock) ── */
+    /* ── Bottom Bar (Opal & Uber-Style Floating Capsule Dock) ── */
     .bottom-bar {
-      position: fixed; bottom: calc(env(safe-area-inset-bottom, 12px) + 8px);
-      left: 14px; right: 14px; max-width: 450px; margin: 0 auto;
-      background: rgba(14, 18, 28, 0.88); backdrop-filter: blur(24px) saturate(200%);
-      -webkit-backdrop-filter: blur(24px) saturate(200%);
+      position: fixed;
+      bottom: calc(env(safe-area-inset-bottom, 12px) + 12px);
+      left: 50%;
+      transform: translateX(-50%);
+      width: calc(100% - 24px);
+      max-width: 400px;
+      margin: 0 auto;
+      background: rgba(14, 18, 27, 0.88);
+      backdrop-filter: blur(28px) saturate(210%);
+      -webkit-backdrop-filter: blur(28px) saturate(210%);
       border: 1px solid rgba(255, 255, 255, 0.12);
-      border-radius: 22px; padding: 6px;
-      display: flex; justify-content: space-around; gap: 4px; z-index: 100;
-      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+      border-radius: 9999px;
+      padding: 5px 6px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 3px;
+      z-index: 1000;
+      box-shadow: 0 20px 48px -8px rgba(0, 0, 0, 0.85), inset 0 1px 0 rgba(255, 255, 255, 0.14);
     }
     .bar-btn {
-      flex: 1; background: transparent; color: var(--text-secondary);
-      border: none; border-radius: 14px; padding: 8px 6px;
-      font-size: 11.5px; font-weight: 600; display: inline-flex;
-      flex-direction: column; align-items: center; gap: 3px;
-      cursor: pointer; text-decoration: none; transition: all 0.15s;
+      flex: 1;
+      min-width: 0;
+      background: transparent;
+      color: rgba(255, 255, 255, 0.52);
+      border: 1px solid transparent;
+      border-radius: 9999px;
+      padding: 7px 4px;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: -0.2px;
+      display: inline-flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 3px;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      position: relative;
     }
-    .bar-btn:active { background: rgba(255, 255, 255, 0.08); transform: scale(0.96); }
-    .bar-btn.danger { color: var(--red); }
+    .bar-btn svg {
+      transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), stroke 0.2s ease;
+      stroke-width: 2.1;
+      display: block;
+      color: currentColor;
+    }
+    .bar-btn:active {
+      transform: scale(0.92);
+    }
+    /* Active Item: Inner Illuminated Capsule (Exact Opal Style) */
+    .bar-btn.active {
+      background: rgba(255, 255, 255, 0.14);
+      color: #ffffff;
+      font-weight: 700;
+      border-color: rgba(255, 255, 255, 0.14);
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.18);
+    }
+    .bar-btn.active svg {
+      stroke: #ffffff;
+      transform: translateY(-1px);
+    }
+
+    /* Modal Cache Box */
+    .info-cache-box {
+      margin-top: 18px;
+      padding: 12px 14px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+    }
+    .info-cache-text strong {
+      display: block;
+      font-size: 13px;
+      color: var(--text);
+      font-weight: 700;
+    }
+    .info-cache-text p {
+      font-size: 11.5px !important;
+      color: var(--text-tertiary) !important;
+      margin: 2px 0 0 0 !important;
+      line-height: 1.3 !important;
+    }
+    .btn-clear-cache {
+      background: rgba(244, 63, 94, 0.12);
+      color: var(--red);
+      border: 1px solid rgba(244, 63, 94, 0.25);
+      border-radius: 9999px;
+      padding: 7px 14px;
+      font-size: 11.5px;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      white-space: nowrap;
+      transition: all 0.15s;
+    }
+    .btn-clear-cache:active {
+      transform: scale(0.96);
+      background: rgba(244, 63, 94, 0.2);
+    }
 
     /* ── Modals ── */
     .modal-overlay {
@@ -834,13 +922,41 @@
   </div>
 </div>
 
-<!-- Bottom Bar -->
-<div class="bottom-bar">
-  <button class="bar-btn" onclick="openModal('info-modal')">ℹ️ Довідка</button>
-  <button class="bar-btn" onclick="handleDriverBarBtn()">👨‍✈️ Водію</button>
-  <button class="bar-btn" onclick="openModal('install-modal')">📱 На екран</button>
-  <button class="bar-btn danger" onclick="clearAppCache()">🧹 Кеш</button>
-</div>
+<!-- Bottom Bar (Opal & Uber-Style Floating Capsule Dock) -->
+<nav class="bottom-bar" aria-label="Головна навігація">
+  <button class="bar-btn active" id="tab-nav-schedule" onclick="navToSchedule()" aria-label="Головна">
+    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+      <polyline points="9 22 9 12 15 12 15 22"></polyline>
+    </svg>
+    <span>Головна</span>
+  </button>
+  <button class="bar-btn" id="tab-nav-driver" onclick="handleDriverBarBtn()" aria-label="Водію">
+    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="12" r="10"></circle>
+      <circle cx="12" cy="12" r="3"></circle>
+      <line x1="12" y1="2" x2="12" y2="9"></line>
+      <line x1="4.93" y1="16.5" x2="9.5" y2="13.5"></line>
+      <line x1="19.07" y1="16.5" x2="14.5" y2="13.5"></line>
+    </svg>
+    <span>Водію</span>
+  </button>
+  <button class="bar-btn" id="tab-nav-info" onclick="openModal('info-modal')" aria-label="Довідка">
+    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="12" r="10"></circle>
+      <line x1="12" y1="16" x2="12" y2="12"></line>
+      <line x1="12" y1="8" x2="12.01" y2="8"></line>
+    </svg>
+    <span>Довідка</span>
+  </button>
+  <button class="bar-btn" id="tab-nav-install" onclick="openModal('install-modal')" aria-label="Додаток">
+    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="5" y="2" width="14" height="20" rx="3" ry="3"></rect>
+      <line x1="12" y1="18" x2="12.01" y2="18"></line>
+    </svg>
+    <span>Додаток</span>
+  </button>
+</nav>
 
 <!-- Passenger Report Modal (Friendly crowd options) -->
 <div class="modal-overlay" id="report-modal" onclick="closeOnBg(event, 'report-modal')">
@@ -913,6 +1029,17 @@
         <li>Факт прибуття завжди скасовує будь-які скарги на затримку.</li>
         <li>Офіційне скасування рейсу має право зробити лише водій автобуса через свій пульт.</li>
       </ul>
+
+      <div class="info-cache-box">
+        <div class="info-cache-text">
+          <strong>Очищення кешу</strong>
+          <p>Якщо розклад не оновлюється або показує застарілі дані</p>
+        </div>
+        <button class="btn-clear-cache" onclick="clearAppCache()">
+          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
+          Очистити
+        </button>
+      </div>
     </div>
   </div>
 </div>
@@ -1588,6 +1715,21 @@ function applyDriverMode() {
   } else {
     switchDriverView('passenger');
   }
+  syncBottomBarState();
+}
+
+function syncBottomBarState() {
+  const navSched = document.getElementById('tab-nav-schedule');
+  const navDrv = document.getElementById('tab-nav-driver');
+  if (!navSched || !navDrv) return;
+
+  if (isDriverMode && driverViewMode === 'cockpit') {
+    navSched.classList.remove('active');
+    navDrv.classList.add('active');
+  } else {
+    navSched.classList.add('active');
+    navDrv.classList.remove('active');
+  }
 }
 
 function exitDriverMode() {
@@ -1597,6 +1739,15 @@ function exitDriverMode() {
   localStorage.removeItem('driverPin');
   applyDriverMode();
   updateAll();
+  syncBottomBarState();
+}
+
+function navToSchedule() {
+  if (isDriverMode && driverViewMode === 'cockpit') {
+    switchDriverView('passenger');
+  }
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  syncBottomBarState();
 }
 
 function handleDriverBarBtn() {
@@ -1622,6 +1773,7 @@ function switchDriverView(mode) {
     if (pNotice) pNotice.style.display = 'none';
     if (drvCockpit) drvCockpit.style.display = 'none';
     if (passView) passView.style.display = 'block';
+    syncBottomBarState();
     return;
   }
 
@@ -1641,6 +1793,7 @@ function switchDriverView(mode) {
     if (passView) passView.style.display = 'block';
     updateAll();
   }
+  syncBottomBarState();
 }
 
 function setDriverRoute(routeKey) {
