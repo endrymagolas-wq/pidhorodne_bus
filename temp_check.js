@@ -1561,6 +1561,64 @@ function fallbackCopyText(text) {
   }
 }
 
+// в”Ђв”Ђ PWA Install Floating Toast Popup в”Ђв”Ђ
+function checkAndShowPwaToast() {
+  const isStandalone = window.navigator.standalone || window.matchMedia('(display-mode: standalone)').matches;
+  if (isStandalone) return;
+  if (isDriverMode && driverViewMode === 'cockpit') return;
+
+  const dismissedTime = localStorage.getItem('pwa_toast_dismissed_v1');
+  if (dismissedTime) {
+    const daysSince = (Date.now() - parseInt(dismissedTime, 10)) / (1000 * 60 * 60 * 24);
+    if (daysSince < 5) return;
+  }
+
+  setTimeout(() => {
+    const toast = document.getElementById('pwa-install-toast');
+    if (toast && !document.querySelector('.modal-overlay.open')) {
+      toast.style.display = 'block';
+      requestAnimationFrame(() => {
+        toast.classList.add('visible');
+      });
+    }
+  }, 1200);
+}
+
+function dismissPwaToast() {
+  const toast = document.getElementById('pwa-install-toast');
+  if (toast) {
+    toast.classList.remove('visible');
+    setTimeout(() => {
+      toast.style.display = 'none';
+    }, 350);
+  }
+  try {
+    localStorage.setItem('pwa_toast_dismissed_v1', Date.now().toString());
+  } catch(e) {}
+  tgHaptic('selection');
+}
+
+function openPwaInstallFromToast() {
+  dismissPwaToast();
+  navToInstall();
+}
+
+function copyDirectBusLinkFromToast(btn) {
+  copyDirectBusLink();
+  tgHaptic('impact_light');
+  if (btn) {
+    const origHtml = btn.innerHTML;
+    btn.innerHTML = '<span>вњ“ РЎРєРѕРїС–Р№РѕРІР°РЅРѕ!</span>';
+    btn.style.background = 'var(--accent-soft)';
+    btn.style.color = 'var(--accent)';
+    setTimeout(() => {
+      btn.innerHTML = origHtml;
+      btn.style.background = '';
+      btn.style.color = '';
+    }, 2200);
+  }
+}
+
 // в”Ђв”Ђ Native Sheet Drag-Down Gesture в”Ђв”Ђ
 function setupSheetDragGestures() {
   document.querySelectorAll('.modal-sheet').forEach(sheet => {
@@ -1612,6 +1670,7 @@ fetchWeather();
 fetchLiveReports();
 applyDriverMode();
 setupSheetDragGestures();
+checkAndShowPwaToast();
 
 window.addEventListener('resize', () => {
   updateDockIndicator();

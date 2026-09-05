@@ -1228,6 +1228,130 @@
       margin-bottom: 4px;
     }
 
+    /* ── Floating Install Popup / Toast (Native Glassmorphism) ── */
+    .pwa-toast-popup {
+      position: fixed;
+      bottom: calc(env(safe-area-inset-bottom, 20px) + 76px);
+      left: 14px;
+      right: 14px;
+      max-width: 440px;
+      margin: 0 auto;
+      background: rgba(26, 20, 16, 0.94);
+      backdrop-filter: var(--glass-blur);
+      -webkit-backdrop-filter: var(--glass-blur);
+      border: 1px solid rgba(226, 147, 66, 0.38);
+      border-radius: 18px;
+      padding: 13px 14px;
+      box-shadow: 0 12px 36px rgba(0, 0, 0, 0.7), 0 0 20px rgba(226, 147, 66, 0.18);
+      z-index: 990;
+      display: none;
+      transform: translateY(24px) scale(0.97);
+      opacity: 0;
+      transition: transform 0.35s var(--f2-curve-spatial), opacity 0.35s var(--f2-curve-spatial);
+    }
+    .pwa-toast-popup.visible {
+      display: block;
+      transform: translateY(0) scale(1);
+      opacity: 1;
+    }
+    .pwa-toast-content {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+    }
+    .pwa-toast-icon {
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      background: rgba(226, 147, 66, 0.15);
+      border: 1px solid rgba(226, 147, 66, 0.35);
+      color: var(--accent);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .pwa-toast-body {
+      flex: 1;
+      min-width: 0;
+    }
+    .pwa-toast-title-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 2px;
+    }
+    .pwa-toast-title {
+      font-size: 13.5px;
+      font-weight: 800;
+      color: #ffffff;
+      letter-spacing: -0.2px;
+    }
+    .pwa-toast-close {
+      background: transparent;
+      border: none;
+      color: var(--text-tertiary);
+      font-size: 15px;
+      cursor: pointer;
+      padding: 2px 6px;
+      line-height: 1;
+      border-radius: 6px;
+      transition: color 0.15s;
+    }
+    .pwa-toast-close:active {
+      color: #ffffff;
+    }
+    .pwa-toast-desc {
+      font-size: 11.5px;
+      color: var(--text-secondary);
+      line-height: 1.35;
+      margin-bottom: 9px;
+    }
+    .pwa-toast-desc b {
+      color: var(--accent);
+    }
+    .pwa-toast-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .pwa-toast-btn-primary {
+      background: var(--accent);
+      color: #100c0a;
+      border: none;
+      border-radius: 9999px;
+      padding: 7px 13px;
+      font-size: 12px;
+      font-weight: 800;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      box-shadow: 0 2px 10px rgba(226, 147, 66, 0.3);
+      transition: transform 0.15s;
+    }
+    .pwa-toast-btn-primary:active {
+      transform: scale(0.96);
+    }
+    .pwa-toast-btn-secondary {
+      background: rgba(255, 235, 220, 0.08);
+      color: var(--text-warm);
+      border: 1px solid var(--border);
+      border-radius: 9999px;
+      padding: 7px 12px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      transition: background 0.15s;
+    }
+    .pwa-toast-btn-secondary:active {
+      background: rgba(255, 235, 220, 0.16);
+    }
+
     ::-webkit-scrollbar { width: 0; height: 0; }
   </style>
 </head>
@@ -1556,6 +1680,37 @@
     <span>Додаток</span>
   </button>
 </nav>
+
+<!-- PWA Install Popup Toast -->
+<div class="pwa-toast-popup" id="pwa-install-toast" role="alert">
+  <div class="pwa-toast-content">
+    <div class="pwa-toast-icon">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="5" y="2" width="14" height="20" rx="3" ry="3"></rect>
+        <line x1="12" y1="18" x2="12.01" y2="18"></line>
+      </svg>
+    </div>
+    <div class="pwa-toast-body">
+      <div class="pwa-toast-title-row">
+        <span class="pwa-toast-title">Встановити як додаток</span>
+        <button class="pwa-toast-close" onclick="dismissPwaToast()" aria-label="Закрити">✕</button>
+      </div>
+      <div class="pwa-toast-desc">
+        Збережіть розклад на екран телефону через лінк. Детальна інструкція — у вкладці <b>«Додаток»</b> ⬇️
+      </div>
+      <div class="pwa-toast-actions">
+        <button class="pwa-toast-btn-primary" onclick="openPwaInstallFromToast()">
+          <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+          <span>Як встановити</span>
+        </button>
+        <button class="pwa-toast-btn-secondary" onclick="copyDirectBusLinkFromToast(this)">
+          <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+          <span>Скопіювати лінк</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
 
 <!-- Passenger Report Modal (Friendly crowd options) -->
 <div class="modal-overlay" id="report-modal" onclick="closeOnBg(event, 'report-modal')">
@@ -3304,6 +3459,64 @@ function fallbackCopyText(text) {
   }
 }
 
+// ── PWA Install Floating Toast Popup ──
+function checkAndShowPwaToast() {
+  const isStandalone = window.navigator.standalone || window.matchMedia('(display-mode: standalone)').matches;
+  if (isStandalone) return;
+  if (isDriverMode && driverViewMode === 'cockpit') return;
+
+  const dismissedTime = localStorage.getItem('pwa_toast_dismissed_v1');
+  if (dismissedTime) {
+    const daysSince = (Date.now() - parseInt(dismissedTime, 10)) / (1000 * 60 * 60 * 24);
+    if (daysSince < 5) return;
+  }
+
+  setTimeout(() => {
+    const toast = document.getElementById('pwa-install-toast');
+    if (toast && !document.querySelector('.modal-overlay.open')) {
+      toast.style.display = 'block';
+      requestAnimationFrame(() => {
+        toast.classList.add('visible');
+      });
+    }
+  }, 1200);
+}
+
+function dismissPwaToast() {
+  const toast = document.getElementById('pwa-install-toast');
+  if (toast) {
+    toast.classList.remove('visible');
+    setTimeout(() => {
+      toast.style.display = 'none';
+    }, 350);
+  }
+  try {
+    localStorage.setItem('pwa_toast_dismissed_v1', Date.now().toString());
+  } catch(e) {}
+  tgHaptic('selection');
+}
+
+function openPwaInstallFromToast() {
+  dismissPwaToast();
+  navToInstall();
+}
+
+function copyDirectBusLinkFromToast(btn) {
+  copyDirectBusLink();
+  tgHaptic('impact_light');
+  if (btn) {
+    const origHtml = btn.innerHTML;
+    btn.innerHTML = '<span>✓ Скопійовано!</span>';
+    btn.style.background = 'var(--accent-soft)';
+    btn.style.color = 'var(--accent)';
+    setTimeout(() => {
+      btn.innerHTML = origHtml;
+      btn.style.background = '';
+      btn.style.color = '';
+    }, 2200);
+  }
+}
+
 // ── Native Sheet Drag-Down Gesture ──
 function setupSheetDragGestures() {
   document.querySelectorAll('.modal-sheet').forEach(sheet => {
@@ -3355,6 +3568,7 @@ fetchWeather();
 fetchLiveReports();
 applyDriverMode();
 setupSheetDragGestures();
+checkAndShowPwaToast();
 
 window.addEventListener('resize', () => {
   updateDockIndicator();
