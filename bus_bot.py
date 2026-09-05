@@ -2,11 +2,14 @@
 # -*- coding: utf-8 -*-
 """
 Модуль розкладу автобусів Підгородне <-> Тернопіль для Flask / PythonAnywhere
-Забезпечує роботу 24/7 Telegram Webhook та веб-додатка /bus
+Забезпечує роботу 24/7 Telegram Webhook та веб-додатка /bus,
+краудсорсинг звітів пасажирів і кабінет водія.
 """
 
 import os
 import sys
+import sqlite3
+import json
 from datetime import datetime, timezone, timedelta
 
 # Сумісність urllib3 з pyTelegramBotAPI
@@ -22,7 +25,7 @@ except Exception:
 
 import telebot
 from telebot import types
-from flask import request, Response
+from flask import request, Response, jsonify
 
 # Налаштування проксі для PythonAnywhere
 if "PYTHONANYWHERE_DOMAIN" in os.environ or os.path.exists("/home/AvalonKnight"):
@@ -40,9 +43,11 @@ except Exception:
 BUS_TOKEN = os.getenv("PIDHORODNE_BOT_TOKEN", "8972553566:AAEvFKwONSaYRHdFvNa_oGxqBw1K29kQBmg")
 SERVER_URL = os.getenv("SERVER_URL", "https://avalonknight.pythonanywhere.com")
 WEBAPP_URL = f"{SERVER_URL.rstrip('/')}/bus"
+DRIVER_PIN = os.getenv("DRIVER_PIN", "2026")
 
 bot = telebot.TeleBot(BUS_TOKEN, threaded=False)
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+DB_PATH = os.path.join(BASE_DIR, "bus_reports.db")
 
 ROUTES = {
     'pidg': {'code': 'Підг', 'name': 'Підгородне (пряма)', 'icon': '🟢'},
@@ -51,7 +56,6 @@ ROUTES = {
     'dom':  {'code': 'Дом',  'name': 'Домаморич', 'icon': '🟣'}
 }
 
-# Розклад з АС-2 (без міського рейсу №40)
 SCHEDULE_TO_PIDG = [
     ("06:30", "drag"), ("06:40", "pidg"), ("06:45", "zab"), ("07:10", "drag"),
     ("07:25", "dom"),  ("07:45", "pidg"), ("07:50", "drag"), ("08:15", "zab"),
@@ -65,7 +69,6 @@ SCHEDULE_TO_PIDG = [
     ("20:15", "drag")
 ]
 
-# Розклад з Нижньої зупинки в Підгородньому
 SCHEDULE_TO_TERN = [
     ("07:00", "drag"), ("07:05", "pidg"), ("07:20", "zab"), ("07:40", "drag"),
     ("08:05", "dom"),  ("08:10", "pidg"), ("08:20", "drag"), ("08:50", "zab"),
@@ -77,6 +80,29 @@ SCHEDULE_TO_TERN = [
     ("17:50", "drag"), ("18:20", "zab"),  ("18:30", "pidg"), ("18:35", "dom"),
     ("18:50", "drag"), ("19:45", "pidg"), ("19:50", "drag"), ("20:05", "zab")
 ]
+
+def init_db():
+    try:
+        with sqlite3.connect(DB_PATH) as conn:
+            c = conn.cursor()
+            c.execute('''
+                CREATE TABLE IF NOT EXISTS reports (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    date_str TEXT,
+                    direction TEXT,
+                    trip_time TEXT,
+                    route_type TEXT,
+                    report_type TEXT,
+                    status TEXT,
+                    stop_name TEXT,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                )
+            ''')
+            conn.commit()
+    except Exception as e:
+        print(f"Error initializing DB: {e}", flush=True)
+
+init_db()
 
 def parse_minutes(time_str: str) -> int:
     h, m = map(int, time_str.split(':'))
@@ -117,14 +143,97 @@ def send_welcome(message):
         "• <b>McDonald's / Танк</b> (Мазепи, +6 хв)\n"
         "• <b>Бережанська</b> (ЗУНУ, +8 хв)\n"
         "• <b>Підгородне (Нижня зупинка)</b> (+17 хв)\n\n"
-        "<i>Міський маршрут №40 виключено з розкладу, оскільки він курсує лише до міського кладовища і не доїжджає до центру села.</i>\n\n"
-        "Обирайте потрібну дію або відкривайте зручний веб-розклад із вибором будь-якої зупинки 👇"
+        "<i>Міський маршрут №40 виключено з розкладу (курсує лише до кладовища).</i>\n\n"
+        "👨‍✈️ <i>Водії автобусів можуть скористатися командою /driver для статусу рейсів.</i>\n\n"
+        "Обирайте дію нижче або відкривайте веб-додаток 👇"
     )
     inline_markup = types.InlineKeyboardMarkup()
-    inline_markup.add(types.InlineKeyboardButton("📲 Відкрити веб-розклад (з вибором зупинки)", web_app=types.WebAppInfo(url=WEBAPP_URL)))
+    inline_markup.add(types.InlineKeyboardButton("📲 Відкрити веб-розклад", web_app=types.WebAppInfo(url=WEBAPP_URL)))
 
     bot.send_message(message.chat.id, text, parse_mode="HTML", reply_markup=build_main_keyboard())
-    bot.send_message(message.chat.id, "✨ Натисніть кнопку, щоб відкрити інтерактивний таймер:", reply_markup=inline_markup)
+    bot.send_message(message.chat.id, "✨ Інтерактивний таймер та відмітки:", reply_markup=inline_markup)
+
+@bot.message_handler(commands=['driver'])
+def driver_cmd(message):
+    parts = message.text.strip().split()
+    if len(parts) > 1 and parts[1] == DRIVER_PIN:
+        show_driver_menu(message.chat.id)
+    else:
+        text = (
+            "👨‍✈️ <b>Кабінет водія</b>\n\n"
+            "Введіть пін-код для доступу: <code>/driver 2026</code>\n"
+            "Або скористайтесь секретним веб-посиланням у кабінеті водія на сайті."
+        )
+        bot.send_message(message.chat.id, text, parse_mode="HTML")
+
+def show_driver_menu(chat_id):
+    now = get_kyiv_now()
+    cur_m = now.hour * 60 + now.minute
+
+    # Знаходимо найближчі рейси з АС-2 та з села
+    next_to_pidg = None
+    for t, r in SCHEDULE_TO_PIDG:
+        if parse_minutes(t) >= cur_m - 10:
+            next_to_pidg = (t, r)
+            break
+
+    next_to_tern = None
+    for t, r in SCHEDULE_TO_TERN:
+        if parse_minutes(t) >= cur_m - 10:
+            next_to_tern = (t, r)
+            break
+
+    markup = types.InlineKeyboardMarkup(row_width=1)
+    if next_to_pidg:
+        t, r = next_to_pidg
+        r_name = ROUTES[r]['name']
+        markup.add(
+            types.InlineKeyboardButton(f"🟢 Виїжджаю з АС-2 о {t} ({r_name})", callback_data=f"drv_ok_to-pidg_{t}_{r}"),
+            types.InlineKeyboardButton(f"❌ Скасовано рейс {t} з АС-2", callback_data=f"drv_cancel_to-pidg_{t}_{r}")
+        )
+    if next_to_tern:
+        t, r = next_to_tern
+        r_name = ROUTES[r]['name']
+        markup.add(
+            types.InlineKeyboardButton(f"🟢 Виїжджаю з Села о {t} ({r_name})", callback_data=f"drv_ok_to-tern_{t}_{r}"),
+            types.InlineKeyboardButton(f"❌ Скасовано рейс {t} з Села", callback_data=f"drv_cancel_to-tern_{t}_{r}")
+        )
+
+    markup.add(types.InlineKeyboardButton("🌐 Відкрити кабінет водія на сайті", web_app=types.WebAppInfo(url=f"{WEBAPP_URL}?driver={DRIVER_PIN}")))
+
+    text = "👨‍✈️ <b>Панель керування водія</b>\nОберіть статус найближчого рейсу:"
+    bot.send_message(chat_id, text, parse_mode="HTML", reply_markup=markup)
+
+@bot.callback_query_handler(func=lambda call: call.data.startswith('drv_'))
+def handle_driver_callback(call):
+    # drv_status_dir_time_route
+    parts = call.data.split('_')
+    if len(parts) >= 5:
+        action = parts[1] # ok / cancel
+        direction = parts[2]
+        trip_time = parts[3]
+        route_type = parts[4]
+
+        today_str = get_kyiv_now().strftime("%Y-%m-%d")
+        status_val = "ok" if action == "ok" else "cancelled"
+
+        try:
+            with sqlite3.connect(DB_PATH) as conn:
+                c = conn.cursor()
+                c.execute('''
+                    INSERT INTO reports (date_str, direction, trip_time, route_type, report_type, status, stop_name)
+                    VALUES (?, ?, ?, ?, 'driver', ?, 'base')
+                ''', (today_str, direction, trip_time, route_type, status_val))
+                conn.commit()
+
+            status_text = "🟢 Підтверджено виїзд за графіком" if action == "ok" else "❌ Рейс скасовано"
+            bot.answer_callback_query(call.id, f"Статус збережено: {status_text}")
+            bot.edit_message_text(
+                f"✅ <b>Дякуємо! Статус оновлено:</b>\nРейс <b>{trip_time}</b> ({ROUTES[route_type]['name']}): <b>{status_text}</b>.\nІнформація миттєво з'явилася на сайті та в боті для пасажирів.",
+                call.message.chat.id, call.message.message_id, parse_mode="HTML"
+            )
+        except Exception as e:
+            bot.answer_callback_query(call.id, f"Помилка: {e}")
 
 @bot.message_handler(commands=['site', 'app', 'link'])
 def send_site_link(message):
@@ -348,7 +457,7 @@ def info_warning(message):
     bot.send_message(message.chat.id, text, parse_mode="HTML")
 
 def register_bus_routes(app):
-    """Підключає маршрути для веб-додатка та вебхука бота до існуючого Flask додатку"""
+    """Підключає маршрути для веб-додатка, API та вебхука бота до існуючого Flask додатку"""
 
     @app.route("/bus", methods=["GET"])
     def bus_web_app():
@@ -367,6 +476,83 @@ def register_bus_routes(app):
                 content = f.read()
             return Response(content, mimetype="application/json; charset=utf-8")
         return "{}", 200
+
+    @app.route("/bus/api/status", methods=["GET"])
+    def bus_api_status():
+        """Повертає статус рейсів на сьогодні (звіти водіїв та спостереження пасажирів)"""
+        today_str = get_kyiv_now().strftime("%Y-%m-%d")
+        try:
+            with sqlite3.connect(DB_PATH) as conn:
+                conn.row_factory = sqlite3.Row
+                c = conn.cursor()
+                c.execute('''
+                    SELECT direction, trip_time, route_type, report_type, status, stop_name, created_at
+                    FROM reports
+                    WHERE date_str = ?
+                    ORDER BY id DESC
+                ''', (today_str,))
+                rows = c.fetchall()
+
+            reports_data = [dict(r) for r in rows]
+            return jsonify({"ok": True, "date": today_str, "reports": reports_data})
+        except Exception as e:
+            return jsonify({"ok": False, "error": str(e)}), 500
+
+    @app.route("/bus/api/report-passenger", methods=["POST"])
+    def bus_report_passenger():
+        """Пасажир відмічає: 'Автобус проїхав зупинку X'"""
+        try:
+            data = request.get_json() or {}
+            direction = data.get("direction")
+            trip_time = data.get("trip_time")
+            route_type = data.get("route_type")
+            stop_name = data.get("stop_name", "зупинку")
+
+            if not direction or not trip_time or not route_type:
+                return jsonify({"ok": False, "error": "Missing params"}), 400
+
+            today_str = get_kyiv_now().strftime("%Y-%m-%d")
+            with sqlite3.connect(DB_PATH) as conn:
+                c = conn.cursor()
+                c.execute('''
+                    INSERT INTO reports (date_str, direction, trip_time, route_type, report_type, status, stop_name)
+                    VALUES (?, ?, ?, ?, 'passenger', 'seen', ?)
+                ''', (today_str, direction, trip_time, route_type, stop_name))
+                conn.commit()
+
+            return jsonify({"ok": True, "message": "Дякуємо за відмітку!"})
+        except Exception as e:
+            return jsonify({"ok": False, "error": str(e)}), 500
+
+    @app.route("/bus/api/report-driver", methods=["POST"])
+    def bus_report_driver():
+        """Водій встановлює статус рейсу: 'ok' / 'cancelled' / 'delayed_10'"""
+        try:
+            data = request.get_json() or {}
+            pin = str(data.get("pin", "")).strip()
+            if pin != DRIVER_PIN:
+                return jsonify({"ok": False, "error": "Невірний PIN-код"}), 403
+
+            direction = data.get("direction")
+            trip_time = data.get("trip_time")
+            route_type = data.get("route_type")
+            status_val = data.get("status", "ok")
+
+            if not direction or not trip_time or not route_type:
+                return jsonify({"ok": False, "error": "Missing params"}), 400
+
+            today_str = get_kyiv_now().strftime("%Y-%m-%d")
+            with sqlite3.connect(DB_PATH) as conn:
+                c = conn.cursor()
+                c.execute('''
+                    INSERT INTO reports (date_str, direction, trip_time, route_type, report_type, status, stop_name)
+                    VALUES (?, ?, ?, ?, 'driver', ?, 'base')
+                ''', (today_str, direction, trip_time, route_type, status_val))
+                conn.commit()
+
+            return jsonify({"ok": True, "message": "Статус водія успішно збережено!"})
+        except Exception as e:
+            return jsonify({"ok": False, "error": str(e)}), 500
 
     @app.route("/bus-telegram", methods=["POST"])
     def bus_telegram_webhook():
@@ -387,4 +573,4 @@ def register_bus_routes(app):
         except Exception as e:
             return f"❌ Помилка налаштування Webhook: {e}", 500
 
-    print("🚌 Маршрути Підгородне Bus успішно підключено до Flask!", flush=True)
+    print("🚌 Маршрути та API Підгородне Bus успішно підключено до Flask!", flush=True)

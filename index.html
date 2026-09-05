@@ -50,9 +50,19 @@
 
     .container { max-width: 480px; margin: 0 auto; }
 
+    /* ── Weather Widget ── */
+    .weather-bar {
+      display: flex; justify-content: space-between; align-items: center;
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 10px; padding: 6px 12px; font-size: 12px;
+      color: var(--text-secondary); margin-bottom: 10px;
+    }
+    .weather-left { display: flex; align-items: center; gap: 6px; }
+    .weather-temp { font-weight: 700; color: var(--text); }
+
     /* ── Header ── */
     header {
-      padding: 14px 0 18px;
+      padding: 6px 0 16px;
       display: flex; justify-content: space-between; align-items: flex-start;
     }
     .title-group h1 { font-size: 19px; font-weight: 700; letter-spacing: -0.3px; }
@@ -61,6 +71,15 @@
       font-size: 15px; font-weight: 600; color: var(--text-secondary);
       font-variant-numeric: tabular-nums; padding-top: 2px;
     }
+
+    /* ── Driver Banner (if driver mode) ── */
+    .driver-banner {
+      display: none; background: rgba(201, 180, 88, 0.15); border: 1.5px solid var(--yellow);
+      border-radius: var(--radius); padding: 10px 14px; margin-bottom: 12px;
+      font-size: 12.5px; color: var(--yellow);
+    }
+    .driver-banner.active { display: block; }
+    .driver-banner-title { font-weight: 700; display: flex; justify-content: space-between; align-items: center; }
 
     /* ── Direction Tabs ── */
     .dir-tabs { display: flex; gap: 8px; margin-bottom: 12px; }
@@ -106,6 +125,7 @@
     .next-card {
       background: var(--surface); border: 1.5px solid var(--border);
       border-radius: var(--radius); padding: 16px; margin-bottom: 14px;
+      position: relative;
     }
     .next-card-header { font-size: 11.5px; font-weight: 600; color: var(--text-tertiary); margin-bottom: 10px; }
     .next-card-main {
@@ -127,6 +147,17 @@
       display: flex; align-items: center; gap: 8px;
       font-size: 14px; font-weight: 600; margin-bottom: 12px;
     }
+
+    /* Live status badge */
+    .status-badge {
+      display: inline-flex; align-items: center; gap: 5px;
+      padding: 4px 9px; border-radius: 6px; font-size: 11.5px; font-weight: 600;
+      margin-bottom: 10px; width: fit-content;
+    }
+    .badge-driver-ok { background: var(--green-soft); color: var(--green); border: 1px solid rgba(124, 184, 122, 0.4); }
+    .badge-driver-cancel { background: var(--red-soft); color: var(--red); border: 1px solid rgba(201, 113, 113, 0.4); }
+    .badge-seen { background: var(--blue-soft); color: var(--blue); border: 1px solid rgba(107, 159, 206, 0.4); }
+
     .next-card-details {
       background: var(--surface-raised); border-radius: 8px;
       padding: 10px 12px; font-size: 13px; color: var(--text-secondary);
@@ -134,6 +165,20 @@
     }
     .detail-row { display: flex; justify-content: space-between; align-items: center; }
     .detail-row strong { color: var(--text); font-weight: 600; }
+
+    /* Action Buttons row (Share, Calendar, Report) */
+    .next-card-actions {
+      display: flex; gap: 6px; margin-top: 12px;
+    }
+    .card-act-btn {
+      flex: 1; background: var(--surface-raised); border: 1px solid var(--border);
+      color: var(--text); border-radius: 8px; padding: 7px 8px; font-size: 11.5px;
+      font-weight: 600; cursor: pointer; display: inline-flex; align-items: center;
+      justify-content: center; gap: 4px; transition: background 0.15s;
+    }
+    .card-act-btn:active { background: var(--border); }
+    .card-act-btn.highlight { border-color: var(--accent); color: var(--accent); }
+
     .next-card-footer {
       margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border);
       font-size: 12.5px; color: var(--text-tertiary);
@@ -170,6 +215,7 @@
       transition: opacity 0.15s;
     }
     .bus-row.past { opacity: 0.3; }
+    .bus-row.cancelled { opacity: 0.4; text-decoration: line-through; border-color: rgba(201, 113, 113, 0.4); }
     .bus-row.current { border-color: var(--accent); background: var(--accent-soft); }
     .bus-left { display: flex; align-items: center; gap: 12px; }
     .bus-time-col { display: flex; flex-direction: column; }
@@ -180,7 +226,7 @@
     .bus-subtime { font-size: 11px; color: var(--accent); font-weight: 500; }
     .bus-right { text-align: right; display: flex; flex-direction: column; align-items: flex-end; gap: 2px; }
     .bus-route-name { font-size: 12.5px; font-weight: 500; color: var(--text-secondary); }
-    .bus-note { font-size: 10.5px; color: var(--text-tertiary); }
+    .bus-status-tag { font-size: 10.5px; font-weight: 600; }
 
     /* ── Route Pills ── */
     .pill {
@@ -236,12 +282,32 @@
     .modal-body li { margin-bottom: 6px; }
     .modal-body strong { color: var(--text); }
 
+    .driver-pin-input {
+      width: 100%; background: var(--surface-raised); border: 1px solid var(--border);
+      border-radius: 8px; color: var(--text); padding: 10px; font-size: 16px;
+      text-align: center; letter-spacing: 2px; margin-bottom: 12px;
+    }
+    .btn-submit {
+      width: 100%; background: var(--accent); color: #000; border: none;
+      border-radius: 8px; padding: 10px; font-weight: 700; cursor: pointer;
+    }
+
     ::-webkit-scrollbar { width: 0; height: 0; }
   </style>
 </head>
 <body>
 
 <div class="container">
+  <!-- Weather Bar -->
+  <div class="weather-bar" id="weather-bar">
+    <div class="weather-left">
+      <span id="weather-icon">🌤️</span>
+      <span id="weather-desc">Завантаження погоди...</span>
+    </div>
+    <div class="weather-temp" id="weather-temp">--°C</div>
+  </div>
+
+  <!-- Header -->
   <header>
     <div class="title-group">
       <h1>🚌 Підгородне ↔ Тернопіль</h1>
@@ -249,6 +315,15 @@
     </div>
     <div class="clock" id="live-clock">--:--</div>
   </header>
+
+  <!-- Driver Panel Banner (If in driver mode) -->
+  <div class="driver-banner" id="driver-banner">
+    <div class="driver-banner-title">
+      <span>👨‍✈️ Режим водія активовано</span>
+      <button onclick="exitDriverMode()" style="background:none;border:none;color:var(--text-secondary);cursor:pointer;">Вийти</button>
+    </div>
+    <p style="font-size:11.5px;margin-top:4px;">Натискайте кнопки під рейсом, щоб підтвердити виїзд або повідомити про скасування.</p>
+  </div>
 
   <!-- Direction Tabs -->
   <div class="dir-tabs">
@@ -279,7 +354,35 @@
       <span class="pill pill-pidg">🟢 Підг</span>
       <span>Підгородне</span>
     </div>
+
+    <!-- Dynamic Status Badge (Driver / Crowd) -->
+    <div id="hero-status-container"></div>
+
     <div class="next-card-details" id="hero-details"></div>
+
+    <!-- Action Buttons (Share, Calendar, Report) -->
+    <div class="next-card-actions" id="hero-actions">
+      <button class="card-act-btn highlight" onclick="reportSeenBus()">
+        <span>👀 Бачу автобус</span>
+      </button>
+      <button class="card-act-btn" onclick="shareBusTrip()">
+        <span>📤 Поділитися</span>
+      </button>
+      <button class="card-act-btn" onclick="addTripToCalendar()">
+        <span>📅 В календар</span>
+      </button>
+    </div>
+
+    <!-- Driver Actions (Only shown if isDriverMode) -->
+    <div class="next-card-actions" id="driver-actions" style="display:none;margin-top:6px;">
+      <button class="card-act-btn" style="color:var(--green);border-color:rgba(124,184,122,0.4);" onclick="submitDriverReport('ok')">
+        <span>🟢 Виїжджаю</span>
+      </button>
+      <button class="card-act-btn" style="color:var(--red);border-color:rgba(201,113,113,0.4);" onclick="submitDriverReport('cancelled')">
+        <span>❌ Скасовано</span>
+      </button>
+    </div>
+
     <div class="next-card-footer" id="hero-footer">
       <span>Наступний:</span>
       <strong id="hero-following">--:--</strong>
@@ -302,6 +405,7 @@
 <!-- Bottom Bar -->
 <div class="bottom-bar">
   <button class="bar-btn" onclick="openModal('info-modal')">ℹ️ Довідка</button>
+  <button class="bar-btn" onclick="openModal('driver-modal')">👨‍✈️ Водію</button>
   <button class="bar-btn" onclick="openModal('install-modal')">📱 На екран</button>
   <button class="bar-btn danger" onclick="clearAppCache()">🧹 Кеш</button>
 </div>
@@ -328,10 +432,29 @@
         <li>АС-2 → Нижня: <strong>~17 хвилин</strong></li>
         <li>Нижня → АС-2: <strong>~20 хвилин</strong></li>
       </ul>
-      <p><strong>⚠️ Автобус №40 (кладовище):</strong></p>
+      <p><strong>Живі статуси та краудсорсинг:</strong></p>
       <ul>
-        <li>Міський маршрут №40 курсує від Кооперативного коледжу до <strong>Міського кладовища</strong> на околиці. Він <strong>не доїжджає</strong> до Нижньої зупинки (>2,5 км пішки). Тому №40 <strong>не включений</strong> у цей розклад.</li>
+        <li>Якщо ви бачите, що автобус уже на зупинці — натисніть <strong>«👀 Бачу автобус»</strong>, і інші пасажири побачать живу відмітку.</li>
+        <li>Водії мають змогу підтвердити рейс або попередити про скасування через кабінет водія або в Telegram-боті.</li>
       </ul>
+    </div>
+  </div>
+</div>
+
+<!-- Driver Login Modal -->
+<div class="modal-overlay" id="driver-modal" onclick="closeOnBg(event, 'driver-modal')">
+  <div class="modal-sheet">
+    <div class="modal-top">
+      <h3>👨‍✈️ Вхід для водія</h3>
+      <button class="modal-x" onclick="closeModal('driver-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <p>Введіть пін-код для керування статусом рейсів:</p>
+      <input type="password" id="driver-pin-input" class="driver-pin-input" placeholder="ПІН-код" maxlength="8">
+      <button class="btn-submit" onclick="loginDriver()">Увійти</button>
+      <p style="font-size:11.5px;color:var(--text-tertiary);margin-top:10px;text-align:center;">
+        Також водії можуть керувати статусом через Telegram: команда <code>/driver 2026</code>
+      </p>
     </div>
   </div>
 </div>
@@ -368,7 +491,6 @@ const routes = {
 };
 
 // ── Stop configurations ──
-// Offsets are minutes from base departure time (АС-2 for to-pidg, Нижня for to-tern)
 const stopsConfig = {
   'to-pidg': [
     { id: 'as2',         name: 'АС-2',         sub: 'вул. Білогірська',    offset: 0 },
@@ -390,11 +512,9 @@ const stopsConfig = {
   ]
 };
 
-// Destination offsets (for showing arrival at the end of route)
 const destOffset = { 'to-pidg': 17, 'to-tern': 20 };
 const destName = { 'to-pidg': 'Нижня зуп.', 'to-tern': 'АС-2' };
 
-// ── Schedule data (base departure times: АС-2 for to-pidg, Нижня for to-tern) ──
 const scheduleToPidg = [
   {t:"06:30",r:"drag"},{t:"06:40",r:"pidg"},{t:"06:45",r:"zab"},
   {t:"07:10",r:"drag"},{t:"07:25",r:"dom"},{t:"07:45",r:"pidg"},
@@ -430,6 +550,16 @@ const scheduleToTern = [
 let curDir = 'to-pidg';
 let curFilter = 'all';
 let selectedStops = { 'to-pidg': 'mcdonalds', 'to-tern': 'nizhnya' };
+let liveReports = [];
+let isDriverMode = false;
+let driverPin = '';
+
+// Check URL params for driver mode
+const urlParams = new URLSearchParams(window.location.search);
+if (urlParams.get('driver') === '2026') {
+  isDriverMode = true;
+  driverPin = '2026';
+}
 
 // ── Helpers ──
 function toMin(t) { const [h,m] = t.split(':').map(Number); return h*60+m; }
@@ -459,6 +589,49 @@ function busMinAtStop(bus) {
   return toMin(bus.t) + getStopOffset();
 }
 
+// ── Open-Meteo Weather Fetcher ──
+async function fetchWeather() {
+  try {
+    const res = await fetch('https://api.open-meteo.com/v1/forecast?latitude=49.55&longitude=25.59&current=temperature_2m,weather_code&timezone=Europe%2FKyiv');
+    const data = await res.json();
+    if (data && data.current) {
+      const temp = Math.round(data.current.temperature_2m);
+      const code = data.current.weather_code;
+      let icon = '🌤️';
+      let desc = 'Ясно';
+      if (code >= 51 && code <= 67) { icon = '🌧️'; desc = 'Дощ'; }
+      else if (code >= 71 && code <= 77) { icon = '🌨️'; desc = 'Сніг'; }
+      else if (code >= 80 && code <= 82) { icon = '🌦️'; desc = 'Злива'; }
+      else if (code >= 95) { icon = '⛈️'; desc = 'Гроза'; }
+      else if (code === 1 || code === 2 || code === 3) { icon = '⛅'; desc = 'Мінлива хмарність'; }
+      else if (code === 0) { icon = '☀️'; desc = 'Ясно'; }
+
+      document.getElementById('weather-icon').textContent = icon;
+      document.getElementById('weather-desc').textContent = `${desc} (Тернопіль)`;
+      document.getElementById('weather-temp').textContent = `${temp > 0 ? '+' : ''}${temp}°C`;
+    }
+  } catch(e) {
+    document.getElementById('weather-desc').textContent = 'Підгородне / Тернопіль';
+  }
+}
+
+// ── Live Reports API ──
+async function fetchLiveReports() {
+  try {
+    const res = await fetch('/bus/api/status');
+    const data = await res.json();
+    if (data && data.ok) {
+      liveReports = data.reports || [];
+      updateHeroStatus();
+      renderSchedule();
+    }
+  } catch(e) {}
+}
+
+function getTripReport(dir, tripTime, routeType) {
+  return liveReports.find(r => r.direction === dir && r.trip_time === tripTime && r.route_type === routeType);
+}
+
 // ── Stop selector rendering ──
 function renderStops() {
   const row = document.getElementById('stop-row');
@@ -471,7 +644,6 @@ function renderStops() {
     </button>
   `).join('');
 
-  // Update header sub
   const si = getStopInfo();
   document.getElementById('header-sub').textContent = `Посадка: ${si.name} (${si.sub})`;
 }
@@ -482,7 +654,6 @@ function selectStop(id) {
   updateAll();
 }
 
-// ── Direction ──
 function setDirection(dir) {
   curDir = dir;
   document.getElementById('btn-dir-to-pidg').classList.toggle('active', dir === 'to-pidg');
@@ -491,7 +662,6 @@ function setDirection(dir) {
   updateAll();
 }
 
-// ── Filter ──
 function setFilter(f, el) {
   curFilter = f;
   document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
@@ -499,14 +669,12 @@ function setFilter(f, el) {
   renderSchedule();
 }
 
-// ── Clock ──
 function updateClock() {
   const now = new Date();
   document.getElementById('live-clock').textContent =
     now.toLocaleTimeString('uk-UA', { hour:'2-digit', minute:'2-digit', second:'2-digit', hour12:false });
 }
 
-// ── Data ──
 function getList() {
   const raw = curDir === 'to-pidg' ? scheduleToPidg : scheduleToTern;
   if (curFilter === 'all') return raw;
@@ -536,6 +704,29 @@ function findNext() {
   return { next, following, tomorrow, cur };
 }
 
+// ── Hero Status Badge Update ──
+function updateHeroStatus() {
+  const container = document.getElementById('hero-status-container');
+  const { next } = findNext();
+  if (!next) { container.innerHTML = ''; return; }
+
+  const rep = getTripReport(curDir, next.t, next.r);
+  if (!rep) {
+    container.innerHTML = '';
+    return;
+  }
+
+  if (rep.report_type === 'driver') {
+    if (rep.status === 'ok') {
+      container.innerHTML = `<div class="status-badge badge-driver-ok">🟢 Водій підтвердив виїзд</div>`;
+    } else if (rep.status === 'cancelled') {
+      container.innerHTML = `<div class="status-badge badge-driver-cancel">❌ Водій: рейс скасовано</div>`;
+    }
+  } else if (rep.report_type === 'passenger') {
+    container.innerHTML = `<div class="status-badge badge-seen">👥 Пасажири бачили на зупинці</div>`;
+  }
+}
+
 // ── Hero Card ──
 function updateHero() {
   const { next, following, tomorrow, cur } = findNext();
@@ -544,7 +735,6 @@ function updateHero() {
   const r = routes[next.r];
   const atStop = busMinAtStop(next);
   let diff = tomorrow ? (1440 - cur + atStop) : (atStop - cur);
-  const stopInfo = getStopInfo();
 
   document.getElementById('hero-time').textContent = busTimeAtStop(next);
   document.getElementById('hero-label').textContent = tomorrow ? 'Перший автобус завтра' : 'Найближчий автобус';
@@ -564,13 +754,14 @@ function updateHero() {
     <span class="pill ${r.pill}">${r.icon} ${r.code}</span>
     <span>${r.name}</span>`;
 
-  // Details — show key stops along the route
+  updateHeroStatus();
+
+  // Details — show key stops
   const details = document.getElementById('hero-details');
   const stops = stopsConfig[curDir];
   const baseMin = toMin(next.t);
   let detailsHtml = '';
 
-  // Show 3-4 key stops: boarding stop + 2-3 others
   const keyStopIds = curDir === 'to-pidg'
     ? ['as2', 'zbruch', 'mcdonalds', 'berezhanska', 'nizhnya']
     : ['nizhnya', 'berezhanska', 'mcdonalds', 'zbruch', 'as2'];
@@ -637,17 +828,25 @@ function renderSchedule() {
       const timeAtStop = busTimeAtStop(b);
       const timeAtDest = busTimeAtDest(b);
 
+      const rep = getTripReport(curDir, b.t, b.r);
+      const isCancelled = rep && rep.report_type === 'driver' && rep.status === 'cancelled';
+
       let subText = '';
-      if (!isAtDest) {
+      if (isCancelled) {
+        subText = '❌ СКАСОВАНО ВОДІЄМ';
+      } else if (rep && rep.report_type === 'driver' && rep.status === 'ok') {
+        subText = '🟢 Підтверджено виїзд';
+      } else if (rep && rep.report_type === 'passenger') {
+        subText = '👥 Бачили пасажири';
+      } else if (!isAtDest) {
         subText = `→ ${dName} ~${timeAtDest}`;
       } else {
-        // If already at destination, show departure point time
         const startName = curDir === 'to-pidg' ? 'АС-2' : 'Нижня';
         subText = `з ${startName} ${b.t}`;
       }
 
       html += `
-        <div class="bus-row ${isPast ? 'past' : ''} ${isCurrent ? 'current' : ''}">
+        <div class="bus-row ${isPast ? 'past' : ''} ${isCurrent ? 'current' : ''} ${isCancelled ? 'cancelled' : ''}">
           <div class="bus-left">
             <div class="bus-time-col">
               <span class="bus-time">${timeAtStop}</span>
@@ -664,6 +863,168 @@ function renderSchedule() {
   });
 
   container.innerHTML = html;
+}
+
+// ── Web Share API ──
+async function shareBusTrip() {
+  const { next } = findNext();
+  if (!next) return;
+  const stopInfo = getStopInfo();
+  const time = busTimeAtStop(next);
+  const r = routes[next.r];
+  const shareText = `🚌 Автобус на ${r.name} буде на зупинці «${stopInfo.name}» о ${time}!\nОнлайн-розклад: ${window.location.origin}/bus`;
+
+  if (navigator.share) {
+    try {
+      await navigator.share({
+        title: `Автобус на ${r.name}`,
+        text: shareText,
+        url: `${window.location.origin}/bus`
+      });
+    } catch(e) {}
+  } else {
+    // Fallback: copy to clipboard
+    navigator.clipboard.writeText(shareText);
+    alert('📋 Інформацію про рейс скопійовано в буфер обміну!');
+  }
+}
+
+// ── Add to Calendar (.ics generation) ──
+function addTripToCalendar() {
+  const { next, tomorrow } = findNext();
+  if (!next) return;
+  const stopInfo = getStopInfo();
+  const time = busTimeAtStop(next);
+  const r = routes[next.r];
+
+  const now = new Date();
+  if (tomorrow) now.setDate(now.getDate() + 1);
+
+  const [hours, minutes] = time.split(':').map(Number);
+  const startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate(), hours, minutes, 0);
+  const endDate = new Date(startDate.getTime() + 20 * 60000);
+
+  const pad = n => String(n).padStart(2, '0');
+  const formatICSDate = d => `${d.getFullYear()}${pad(d.getMonth()+1)}${pad(d.getDate())}T${pad(d.getHours())}${pad(d.getMinutes())}00`;
+
+  const icsData = [
+    'BEGIN:VCALENDAR',
+    'VERSION:2.0',
+    'PRODID:-//Pidhorodne Bus//UA',
+    'BEGIN:VEVENT',
+    `SUMMARY:🚌 Автобус: ${r.name}`,
+    `DESCRIPTION:Посадка на зупинці ${stopInfo.name} (${stopInfo.sub}) о ${time}. Напрямок: ${curDir === 'to-pidg' ? 'Підгородне' : 'Тернопіль'}.`,
+    `LOCATION:${stopInfo.name}, Тернопіль`,
+    `DTSTART:${formatICSDate(startDate)}`,
+    `DTEND:${formatICSDate(endDate)}`,
+    'BEGIN:VALARM',
+    'TRIGGER:-PT10M',
+    'ACTION:DISPLAY',
+    'DESCRIPTION:Нагадування: автобус за 10 хвилин!',
+    'END:VALARM',
+    'END:VEVENT',
+    'END:VCALENDAR'
+  ].join('\r\n');
+
+  const blob = new Blob([icsData], { type: 'text/calendar;charset=utf-8' });
+  const link = document.createElement('a');
+  link.href = window.URL.createObjectURL(blob);
+  link.setAttribute('download', `bus_${time.replace(':','')}.ics`);
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+}
+
+// ── Live Crowd Reporting (Passenger) ──
+async function reportSeenBus() {
+  const { next } = findNext();
+  if (!next) return;
+  const stopInfo = getStopInfo();
+  const r = routes[next.r];
+
+  if (confirm(`Підтвердити, що автобус ${r.name} зараз на зупинці «${stopInfo.name}»?`)) {
+    try {
+      const res = await fetch('/bus/api/report-passenger', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          direction: curDir,
+          trip_time: next.t,
+          route_type: next.r,
+          stop_name: stopInfo.name
+        })
+      });
+      const data = await res.json();
+      if (data.ok) {
+        alert('✅ Дякуємо! Вашу відмітку додано в розклад.');
+        fetchLiveReports();
+      }
+    } catch(e) {
+      alert('Помилка відправки відмітки.');
+    }
+  }
+}
+
+// ── Driver Mode Functions ──
+function loginDriver() {
+  const pin = document.getElementById('driver-pin-input').value.trim();
+  if (pin === '2026') {
+    isDriverMode = true;
+    driverPin = pin;
+    closeModal('driver-modal');
+    applyDriverMode();
+    alert('👨‍✈️ Режим водія активовано!');
+  } else {
+    alert('Невірний ПІН-код!');
+  }
+}
+
+function applyDriverMode() {
+  if (isDriverMode) {
+    document.getElementById('driver-banner').classList.add('active');
+    document.getElementById('driver-actions').style.display = 'flex';
+  } else {
+    document.getElementById('driver-banner').classList.remove('active');
+    document.getElementById('driver-actions').style.display = 'none';
+  }
+}
+
+function exitDriverMode() {
+  isDriverMode = false;
+  driverPin = '';
+  applyDriverMode();
+}
+
+async function submitDriverReport(statusVal) {
+  const { next } = findNext();
+  if (!next) return;
+  const r = routes[next.r];
+  const label = statusVal === 'ok' ? 'підтвердити виїзд' : 'СКАСУВАТИ цей рейс';
+
+  if (confirm(`Ви впевнені, що хочете ${label} (${next.t}, ${r.name})?`)) {
+    try {
+      const res = await fetch('/bus/api/report-driver', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          pin: driverPin,
+          direction: curDir,
+          trip_time: next.t,
+          route_type: next.r,
+          status: statusVal
+        })
+      });
+      const data = await res.json();
+      if (data.ok) {
+        alert(statusVal === 'ok' ? '🟢 Виїзд підтверджено!' : '❌ Рейс позначено як скасований.');
+        fetchLiveReports();
+      } else {
+        alert(`Помилка: ${data.error}`);
+      }
+    } catch(e) {
+      alert('Помилка надсилання.');
+    }
+  }
 }
 
 // ── Update all ──
@@ -688,8 +1049,13 @@ function clearAppCache() {
 // ── Init ──
 setInterval(updateClock, 1000);
 setInterval(() => { updateHero(); renderSchedule(); }, 20000);
+setInterval(fetchLiveReports, 30000);
+
 renderStops();
 updateAll();
+fetchWeather();
+fetchLiveReports();
+applyDriverMode();
 </script>
 
 </body>
