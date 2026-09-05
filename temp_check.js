@@ -292,11 +292,11 @@ function setFilter(f, el) {
 
 // в”Ђв”Ђ Collapsible Route Picker в”Ђв”Ђ
 const routePickerLabels = {
-  all: 'рџљЊ Р’СЃС– РјР°СЂС€СЂСѓС‚Рё',
-  pidg: 'рџџў РџС–РґРіРѕСЂРѕРґРЅРµ',
-  drag: 'рџ”µ Р”СЂР°РіР°РЅС–РІРєР°',
-  zab: 'рџџЎ Р—Р°Р±РѕР№РєРё',
-  dom: 'рџџЈ Р”РѕРјР°РјРѕСЂРёС‡'
+  all: 'Р’СЃС– РјР°СЂС€СЂСѓС‚РєРё',
+  pidg: '<span class="route-badge-dot dot-pidg" style="width:8px;height:8px;display:inline-block;margin-right:6px;vertical-align:middle;"></span>РџС–РґРіРѕСЂРѕРґРЅРµ',
+  drag: '<span class="route-badge-dot dot-drag" style="width:8px;height:8px;display:inline-block;margin-right:6px;vertical-align:middle;"></span>Р”СЂР°РіР°РЅС–РІРєР°',
+  zab: '<span class="route-badge-dot dot-zab" style="width:8px;height:8px;display:inline-block;margin-right:6px;vertical-align:middle;"></span>Р—Р°Р±РѕР№РєРё',
+  dom: '<span class="route-badge-dot dot-dom" style="width:8px;height:8px;display:inline-block;margin-right:6px;vertical-align:middle;"></span>Р”РѕРјР°РјРѕСЂРёС‡'
 };
 
 let isRoutePickerOpen = false;
@@ -320,7 +320,7 @@ function pickRoute(filter, el) {
 
   // Update toggle label
   const labelEl = document.getElementById('route-picker-label');
-  if (labelEl) labelEl.textContent = routePickerLabels[filter] || routePickerLabels.all;
+  if (labelEl) labelEl.innerHTML = routePickerLabels[filter] || routePickerLabels.all;
 
   // Auto-close
   isRoutePickerOpen = false;

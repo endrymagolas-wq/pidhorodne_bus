@@ -484,6 +484,11 @@
       border-bottom-right-radius: 0;
       border-bottom-color: transparent;
     }
+    .route-picker-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
     .route-picker-arrow {
       font-size: 12px; color: var(--text-tertiary);
       transition: transform 0.25s var(--f2-curve-spatial);
@@ -1426,12 +1431,12 @@
     <!-- Collapsible Route Picker -->
     <div class="route-picker" id="route-picker">
       <button class="route-picker-toggle" id="route-picker-toggle" onclick="toggleRoutePicker()">
-        <span class="route-picker-label" id="route-picker-label">🚌 Всі маршрути</span>
+        <span class="route-picker-label" id="route-picker-label">Всі маршрутки</span>
         <span class="route-picker-arrow" id="route-picker-arrow">▾</span>
       </button>
       <div class="route-picker-dropdown" id="route-picker-dropdown" style="display:none;">
         <button class="route-pick-opt active" data-filter="all" onclick="pickRoute('all', this)">
-          <span class="route-pick-check">✓</span> Всі маршрути
+          <span class="route-pick-check">✓</span> Всі маршрутки
         </button>
         <button class="route-pick-opt" data-filter="pidg" onclick="pickRoute('pidg', this)">
           <span class="route-badge-dot dot-pidg" style="width:8px;height:8px;"></span> Підгородне
@@ -2030,11 +2035,11 @@ function setFilter(f, el) {
 
 // ── Collapsible Route Picker ──
 const routePickerLabels = {
-  all: '🚌 Всі маршрути',
-  pidg: '🟢 Підгородне',
-  drag: '🔵 Драганівка',
-  zab: '🟡 Забойки',
-  dom: '🟣 Домаморич'
+  all: 'Всі маршрутки',
+  pidg: '<span class="route-badge-dot dot-pidg" style="width:8px;height:8px;display:inline-block;margin-right:6px;vertical-align:middle;"></span>Підгородне',
+  drag: '<span class="route-badge-dot dot-drag" style="width:8px;height:8px;display:inline-block;margin-right:6px;vertical-align:middle;"></span>Драганівка',
+  zab: '<span class="route-badge-dot dot-zab" style="width:8px;height:8px;display:inline-block;margin-right:6px;vertical-align:middle;"></span>Забойки',
+  dom: '<span class="route-badge-dot dot-dom" style="width:8px;height:8px;display:inline-block;margin-right:6px;vertical-align:middle;"></span>Домаморич'
 };
 
 let isRoutePickerOpen = false;
@@ -2058,7 +2063,7 @@ function pickRoute(filter, el) {
 
   // Update toggle label
   const labelEl = document.getElementById('route-picker-label');
-  if (labelEl) labelEl.textContent = routePickerLabels[filter] || routePickerLabels.all;
+  if (labelEl) labelEl.innerHTML = routePickerLabels[filter] || routePickerLabels.all;
 
   // Auto-close
   isRoutePickerOpen = false;
