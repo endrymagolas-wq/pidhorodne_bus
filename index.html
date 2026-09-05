@@ -170,18 +170,49 @@
     }
 
     /* ── Driver Cockpit Layout ── */
+    .drv-active-trip-bar {
+      background: linear-gradient(135deg, rgba(38, 29, 23, 0.95), rgba(26, 20, 16, 0.95));
+      border: 1px solid rgba(226, 147, 66, 0.3);
+      border-radius: 18px; padding: 12px 14px;
+      display: flex; justify-content: space-between; align-items: center;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35); margin-bottom: 12px;
+    }
+    .drv-atb-left { display: flex; align-items: center; gap: 12px; }
+    .drv-atb-time {
+      background: var(--accent); color: #100c0a; font-size: 18px; font-weight: 900;
+      padding: 5px 12px; border-radius: 10px; font-variant-numeric: tabular-nums;
+      letter-spacing: -0.5px;
+    }
+    .drv-atb-meta { display: flex; flex-direction: column; }
+    .drv-atb-route { font-size: 15px; font-weight: 800; color: var(--text); }
+    .drv-atb-dir { font-size: 11.5px; color: var(--text-tertiary); font-weight: 600; margin-top: 1px; }
+    .drv-atb-btn {
+      background: rgba(255, 235, 220, 0.08); border: 1px solid var(--border);
+      color: var(--text-secondary); border-radius: 9999px;
+      padding: 6px 12px; font-size: 12px; font-weight: 700; cursor: pointer;
+      display: inline-flex; align-items: center; gap: 4px; transition: all 0.15s;
+    }
+    .drv-atb-btn:active { transform: scale(0.96); background: rgba(255, 235, 220, 0.15); }
+
+    /* Collapsible Route/Trip Picker Drawer */
+    .drv-picker-drawer {
+      background: rgba(22, 17, 14, 0.7);
+      border: 1px solid var(--border); border-radius: 18px;
+      padding: 12px 14px; margin-bottom: 14px;
+      backdrop-filter: var(--glass-blur);
+    }
     .drv-section-title {
       font-size: 11px; font-weight: 700; color: var(--text-tertiary);
-      text-transform: uppercase; letter-spacing: 0.6px; margin: 16px 0 8px 2px;
+      text-transform: uppercase; letter-spacing: 0.6px; margin: 8px 0 8px 2px;
       display: flex; justify-content: space-between; align-items: center; gap: 6px;
     }
     .drv-route-grid {
-      display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
+      display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px;
     }
     .drv-route-card {
       background: var(--surface); backdrop-filter: var(--glass-blur);
-      border: 1px solid var(--border); border-radius: 16px; padding: 12px 14px;
-      display: flex; align-items: center; gap: 10px; cursor: pointer;
+      border: 1px solid var(--border); border-radius: 14px; padding: 10px 12px;
+      display: flex; align-items: center; gap: 8px; cursor: pointer;
       transition: all 0.18s; text-align: left; box-shadow: var(--shadow-card);
     }
     .drv-route-card:active { transform: scale(0.98); }
@@ -190,56 +221,125 @@
       box-shadow: 0 0 16px rgba(226, 147, 66, 0.2);
     }
     .route-badge-dot {
-      width: 10px; height: 10px; border-radius: 50%; display: inline-block; flex-shrink: 0;
+      width: 9px; height: 9px; border-radius: 50%; display: inline-block; flex-shrink: 0;
       box-shadow: 0 0 8px currentColor;
     }
     .dot-pidg { background: #2ec477; color: #2ec477; }
     .dot-drag { background: #5b8bf7; color: #5b8bf7; }
     .dot-zab  { background: #f59e0b; color: #f59e0b; }
     .dot-dom  { background: #a855f7; color: #a855f7; }
-    .drv-r-name { font-size: 13.5px; font-weight: 700; color: var(--text); }
+    .drv-r-name { font-size: 13px; font-weight: 700; color: var(--text); }
+
+    /* Driver Direction Segmented */
+    .drv-dir-segmented {
+      display: flex; background: rgba(255, 235, 220, 0.04);
+      border: 1px solid var(--border); border-radius: 12px;
+      padding: 3px; gap: 4px; margin: 10px 0 12px 0;
+    }
+    .drv-dir-btn {
+      flex: 1; background: none; border: none; color: var(--text-secondary);
+      border-radius: 9px; padding: 8px 6px; font-size: 12px; font-weight: 700;
+      cursor: pointer; transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      text-align: center;
+    }
+    .drv-dir-btn.active {
+      background: var(--surface-raised); color: var(--accent);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+      border: 1px solid rgba(226, 147, 66, 0.28);
+    }
 
     /* Trip Chips Strip */
     .drv-trip-strip {
-      display: flex; gap: 6px; overflow-x: auto; padding-bottom: 6px; scrollbar-width: none;
+      display: flex; gap: 6px; overflow-x: auto; padding-bottom: 4px; scrollbar-width: none;
     }
     .drv-trip-strip::-webkit-scrollbar { display: none; }
     .drv-trip-chip {
       background: var(--surface); backdrop-filter: var(--glass-blur);
       border: 1.5px solid var(--border); color: var(--text-secondary);
-      border-radius: 20px; padding: 8px 14px; font-size: 14px; font-weight: 700;
+      border-radius: 20px; padding: 7px 12px; font-size: 13.5px; font-weight: 700;
       font-variant-numeric: tabular-nums; cursor: pointer; white-space: nowrap;
-      display: inline-flex; align-items: center; gap: 6px; transition: all 0.15s;
+      display: inline-flex; align-items: center; gap: 5px; transition: all 0.15s;
     }
     .drv-trip-chip:active { transform: scale(0.96); }
     .drv-trip-chip.active {
-      background: var(--accent); color: #000; border-color: var(--accent);
-      box-shadow: 0 2px 12px rgba(16, 185, 129, 0.4);
+      background: var(--accent); color: #100c0a; border-color: var(--accent);
+      box-shadow: 0 2px 10px rgba(226, 147, 66, 0.4);
     }
     .drv-trip-chip.has-progress { border-color: var(--green); }
     .drv-trip-chip.cancelled { text-decoration: line-through; opacity: 0.45; border-color: var(--red); }
 
-    /* Active Trip Card */
-    .drv-active-card {
-      background: var(--surface); backdrop-filter: var(--glass-blur);
-      border: 1.5px solid var(--border); border-radius: 18px; padding: 14px 16px;
-      margin-top: 10px; box-shadow: var(--shadow-card);
+    /* Focus Hero Card */
+    .drv-focus-hero {
+      background: var(--surface); border: 1.5px solid rgba(46, 196, 119, 0.4);
+      border-radius: 20px; padding: 16px 18px; margin-bottom: 12px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3), 0 0 16px rgba(46, 196, 119, 0.08);
     }
-    .drv-card-top { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
-    .drv-trip-badge {
-      background: rgba(255, 255, 255, 0.08); border: 1px solid var(--border);
-      border-radius: 10px; padding: 4px 10px; font-size: 18px; font-weight: 800;
-      color: var(--text); font-variant-numeric: tabular-nums;
+    .drv-focus-label-row {
+      display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;
     }
-    .drv-trip-dest { font-size: 14px; font-weight: 700; color: var(--text-secondary); }
-    .drv-trip-status-row { margin-top: 6px; }
+    .drv-focus-label {
+      font-size: 11px; font-weight: 800; color: var(--green);
+      letter-spacing: 0.6px; text-transform: uppercase;
+    }
+    .drv-focus-eta {
+      font-size: 14px; font-weight: 800; color: var(--text-secondary);
+      font-variant-numeric: tabular-nums;
+    }
+    .drv-focus-stop-name {
+      font-size: 21px; font-weight: 900; color: var(--text);
+      line-height: 1.25; letter-spacing: -0.3px;
+    }
+    .drv-focus-status-row { margin-top: 8px; }
+
+    /* GIANT Driver Advance Button */
+    .btn-drv-big-advance {
+      width: 100%; min-height: 60px;
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      color: #000; border: none; border-radius: 16px; padding: 12px 18px; margin-bottom: 12px;
+      font-weight: 800; cursor: pointer; display: flex; justify-content: space-between; align-items: center;
+      box-shadow: 0 6px 20px rgba(16, 185, 129, 0.35); transition: transform 0.1s, filter 0.1s;
+    }
+    .btn-drv-big-advance:active { transform: scale(0.98); filter: brightness(0.95); }
+    .btn-drv-big-advance.finished {
+      background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+      box-shadow: 0 6px 20px rgba(245, 158, 11, 0.35);
+    }
+    .drv-adv-content { display: flex; flex-direction: column; align-items: flex-start; text-align: left; }
+    .drv-adv-sub { font-size: 10.5px; font-weight: 800; opacity: 0.85; letter-spacing: 0.6px; text-transform: uppercase; }
+    .drv-adv-title { font-size: 16px; font-weight: 800; margin-top: 2px; }
+    .drv-adv-arrow { font-size: 20px; font-weight: 800; }
+
+    /* Driver Action Grid */
+    .drv-action-grid {
+      display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 14px;
+    }
+    .drv-action-btn {
+      border-radius: 14px; padding: 11px 6px; font-size: 12px; font-weight: 700;
+      border: 1px solid var(--border); cursor: pointer; text-align: center;
+      backdrop-filter: var(--glass-blur); transition: transform 0.1s;
+      display: flex; align-items: center; justify-content: center; gap: 6px;
+    }
+    .drv-action-btn:active { transform: scale(0.97); }
+    .drv-btn-delay { background: var(--yellow-soft); color: var(--yellow); border-color: rgba(245, 158, 11, 0.3); }
+    .drv-btn-cancel { background: var(--red-soft); color: var(--red); border-color: rgba(244, 63, 94, 0.3); }
+    .drv-btn-reset { background: var(--surface); color: var(--text-secondary); border-color: var(--border); }
 
     /* Stop Stepper */
     .drv-stepper-card {
       background: var(--surface); backdrop-filter: var(--glass-blur);
-      border: 1.5px solid var(--border); border-radius: 18px; padding: 12px 14px;
-      margin-top: 4px; box-shadow: var(--shadow-card);
+      border: 1.5px solid var(--border); border-radius: 18px; padding: 14px 16px;
+      margin-bottom: 12px; box-shadow: var(--shadow-card);
     }
+    .drv-stepper-header {
+      display: flex; justify-content: space-between; align-items: center;
+      padding-bottom: 8px; border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      margin-bottom: 8px; cursor: pointer;
+    }
+    .drv-stepper-title {
+      font-size: 11.5px; font-weight: 700; color: var(--text-secondary);
+      text-transform: uppercase; letter-spacing: 0.5px; display: flex; align-items: center; gap: 6px;
+    }
+    .drv-stepper-hint { font-size: 11.5px; color: var(--accent); font-weight: 700; }
     .drv-stepper { display: flex; flex-direction: column; gap: 0; }
     .stepper-item {
       display: flex; align-items: center; gap: 12px; padding: 10px 8px;
@@ -283,42 +383,10 @@
     .sbadge-passed { background: var(--green-soft); color: var(--green); }
     .sbadge-target { background: var(--green); color: #000; font-weight: 800; }
 
-    /* GIANT Driver Advance Button */
-    .btn-drv-big-advance {
-      width: 100%; min-height: 60px;
-      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-      color: #000; border: none; border-radius: 16px; padding: 12px 18px; margin-top: 14px;
-      font-weight: 800; cursor: pointer; display: flex; justify-content: space-between; align-items: center;
-      box-shadow: 0 6px 20px rgba(16, 185, 129, 0.35); transition: transform 0.1s, filter 0.1s;
-    }
-    .btn-drv-big-advance:active { transform: scale(0.98); filter: brightness(0.95); }
-    .btn-drv-big-advance.finished {
-      background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-      box-shadow: 0 6px 20px rgba(245, 158, 11, 0.35);
-    }
-    .drv-adv-content { display: flex; flex-direction: column; align-items: flex-start; text-align: left; }
-    .drv-adv-sub { font-size: 10.5px; font-weight: 800; opacity: 0.85; letter-spacing: 0.6px; text-transform: uppercase; }
-    .drv-adv-title { font-size: 16px; font-weight: 800; margin-top: 2px; }
-    .drv-adv-arrow { font-size: 20px; font-weight: 800; }
-
-    /* Driver Action Grid */
-    .drv-action-grid {
-      display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; margin-top: 12px;
-    }
-    .drv-action-btn {
-      border-radius: 12px; padding: 10px 4px; font-size: 11.5px; font-weight: 700;
-      border: 1px solid var(--border); cursor: pointer; text-align: center;
-      backdrop-filter: var(--glass-blur); transition: transform 0.1s;
-    }
-    .drv-action-btn:active { transform: scale(0.97); }
-    .drv-btn-delay { background: var(--yellow-soft); color: var(--yellow); border-color: rgba(245, 158, 11, 0.3); }
-    .drv-btn-cancel { background: var(--red-soft); color: var(--red); border-color: rgba(244, 63, 94, 0.3); }
-    .drv-btn-reset { background: var(--surface); color: var(--text-secondary); border-color: var(--border); }
-
     /* Passenger Preview */
     .drv-preview-card {
       background: rgba(28, 22, 18, 0.65); border: 1px dashed var(--border);
-      border-radius: 14px; padding: 10px 12px; margin-top: 14px; font-size: 12px;
+      border-radius: 14px; padding: 10px 12px; margin-top: 6px; font-size: 12px;
       color: var(--text-secondary); line-height: 1.4;
     }
     .drv-prev-title { font-weight: 700; color: var(--text-tertiary); margin-bottom: 4px; font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.5px; }
@@ -1150,72 +1218,74 @@
 
   <!-- ══════════ FULL DEDICATED DRIVER COCKPIT ══════════ -->
   <div id="driver-cockpit-view" style="display:none;">
-    <!-- Route Selection -->
-    <div class="drv-section-title">
-      <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"></polygon></svg>
-      <span>Оберіть ваш маршрут</span>
-    </div>
-    <div class="drv-route-grid" id="drv-route-grid">
-      <button class="drv-route-card active" id="drv-r-pidg" onclick="setDriverRoute('pidg')">
-        <span class="route-badge-dot dot-pidg"></span>
-        <span class="drv-r-name">Підгородне</span>
-      </button>
-      <button class="drv-route-card" id="drv-r-drag" onclick="setDriverRoute('drag')">
-        <span class="route-badge-dot dot-drag"></span>
-        <span class="drv-r-name">Драганівка</span>
-      </button>
-      <button class="drv-route-card" id="drv-r-zab" onclick="setDriverRoute('zab')">
-        <span class="route-badge-dot dot-zab"></span>
-        <span class="drv-r-name">Забойки</span>
-      </button>
-      <button class="drv-route-card" id="drv-r-dom" onclick="setDriverRoute('dom')">
-        <span class="route-badge-dot dot-dom"></span>
-        <span class="drv-r-name">Домаморич</span>
-      </button>
-    </div>
 
-    <!-- Direction Selector -->
-    <div class="dir-tabs" style="margin-top:14px;">
-      <button class="dir-tab active" id="btn-drv-dir-to-pidg" onclick="setDriverDirection('to-pidg')">
-        <span class="dir-label">З Тернополя</span>
-        <span class="dir-sub">АС-2 → Село</span>
-      </button>
-      <button class="dir-tab" id="btn-drv-dir-to-tern" onclick="setDriverDirection('to-tern')">
-        <span class="dir-label">До Тернополя</span>
-        <span class="dir-sub">Село → АС-2</span>
-      </button>
-    </div>
-
-    <!-- Trip Picker Strip -->
-    <div class="drv-section-title">
-      <span>Рейси на сьогодні:</span>
-      <span id="drv-trips-count" style="font-size:11.5px;color:var(--text-tertiary);"></span>
-    </div>
-    <div class="drv-trip-strip" id="drv-trip-strip">
-      <!-- Generated time chips for selected route & dir -->
-    </div>
-
-    <!-- Current Active Trip Header Card -->
-    <div class="drv-active-card" id="drv-active-card">
-      <div class="drv-card-top">
-        <div class="drv-trip-badge" id="drv-trip-badge">--:--</div>
-        <div class="drv-trip-dest" id="drv-trip-dest">...</div>
+    <!-- Active Trip Compact Bar (Progressive Summary) -->
+    <div class="drv-active-trip-bar" id="drv-active-trip-bar">
+      <div class="drv-atb-left">
+        <span class="drv-atb-time" id="drv-atb-time">13:45</span>
+        <div class="drv-atb-meta">
+          <span class="drv-atb-route" id="drv-atb-route">Підгородне</span>
+          <span class="drv-atb-dir" id="drv-atb-dir">АС-2 → Підгородне</span>
+        </div>
       </div>
-      <div class="drv-trip-status-row" id="drv-trip-status-row">
-        <!-- Status summary badge -->
+      <button class="drv-atb-btn" id="btn-toggle-trip-picker" onclick="toggleDriverTripPicker()">
+        <span id="drv-picker-btn-text">Змінити рейс ▾</span>
+      </button>
+    </div>
+
+    <!-- Collapsible Route & Trip Picker Drawer -->
+    <div class="drv-picker-drawer" id="drv-picker-drawer" style="display:none;">
+      <!-- Route Selection -->
+      <div class="drv-section-title">
+        <span>Маршрут:</span>
+      </div>
+      <div class="drv-route-grid" id="drv-route-grid">
+        <button class="drv-route-card active" id="drv-r-pidg" onclick="setDriverRoute('pidg')">
+          <span class="route-badge-dot dot-pidg"></span>
+          <span class="drv-r-name">Підгородне</span>
+        </button>
+        <button class="drv-route-card" id="drv-r-drag" onclick="setDriverRoute('drag')">
+          <span class="route-badge-dot dot-drag"></span>
+          <span class="drv-r-name">Драганівка</span>
+        </button>
+        <button class="drv-route-card" id="drv-r-zab" onclick="setDriverRoute('zab')">
+          <span class="route-badge-dot dot-zab"></span>
+          <span class="drv-r-name">Забойки</span>
+        </button>
+        <button class="drv-route-card" id="drv-r-dom" onclick="setDriverRoute('dom')">
+          <span class="route-badge-dot dot-dom"></span>
+          <span class="drv-r-name">Домаморич</span>
+        </button>
+      </div>
+
+      <!-- Direction Selector (Apple/Uber Segmented Style) -->
+      <div class="drv-dir-segmented" role="tablist" aria-label="Напрямок водія">
+        <button class="drv-dir-btn active" id="btn-drv-dir-to-pidg" onclick="setDriverDirection('to-pidg')">
+          <span>З Тернополя (АС-2 → Село)</span>
+        </button>
+        <button class="drv-dir-btn" id="btn-drv-dir-to-tern" onclick="setDriverDirection('to-tern')">
+          <span>До Тернополя (Село → АС-2)</span>
+        </button>
+      </div>
+
+      <!-- Trip Picker Strip -->
+      <div class="drv-section-title">
+        <span>Рейси на сьогодні:</span>
+        <span id="drv-trips-count" style="font-size:11.5px;color:var(--text-tertiary);"></span>
+      </div>
+      <div class="drv-trip-strip" id="drv-trip-strip">
+        <!-- Generated time chips for selected route & dir -->
       </div>
     </div>
 
-    <!-- Road Stepper (Дорога по зупинках) -->
-    <div class="drv-section-title" style="margin-top:16px;">
-      <span>Дорога по зупинках:</span>
-      <span style="font-size:11.5px;color:var(--text-tertiary);">Натискайте по мірі руху</span>
-    </div>
-
-    <div class="drv-stepper-card">
-      <div class="drv-stepper" id="drv-stepper">
-        <!-- Interactive stops list -->
+    <!-- TARGET STOP HERO FOCUS CARD -->
+    <div class="drv-focus-hero" id="drv-focus-hero">
+      <div class="drv-focus-label-row">
+        <span class="drv-focus-label">НАСТУПНА ЗУПИНКА:</span>
+        <span class="drv-focus-eta" id="drv-focus-eta">~13:45</span>
       </div>
+      <div class="drv-focus-stop-name" id="drv-focus-stop-name">АС-2 (вул. Білогірська)</div>
+      <div class="drv-focus-status-row" id="drv-trip-status-row"></div>
     </div>
 
     <!-- GIANT Advance Button -->
@@ -1227,25 +1297,39 @@
       <span class="drv-adv-arrow">➔</span>
     </button>
 
-    <!-- Emergency and Utility Buttons -->
+    <!-- Quick Action Pills (Delay, Cancel, Reset) -->
     <div class="drv-action-grid">
       <button class="drv-action-btn drv-btn-delay" onclick="submitDriverTripStatus('delayed_10')">
-        <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
-        <span>+5–10 хв затримка</span>
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+        <span>+5–10 хв</span>
       </button>
       <button class="drv-action-btn drv-btn-cancel" onclick="submitDriverTripStatus('cancelled')">
-        <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>
-        <span>Зняти / скасувати</span>
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>
+        <span>Скасувати</span>
       </button>
       <button class="drv-action-btn drv-btn-reset" onclick="resetDriverTripStops()">
-        <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 15-6.7L21 8"></path><path d="M21 3v5h-5"></path><path d="M21 12a9 9 0 0 1-15 6.7L3 16"></path><path d="M3 21v-5h5"></path></svg>
-        <span>Скинути позначки</span>
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 15-6.7L21 8"></path><path d="M21 3v5h-5"></path><path d="M21 12a9 9 0 0 1-15 6.7L3 16"></path><path d="M3 21v-5h5"></path></svg>
+        <span>Скинути</span>
       </button>
+    </div>
+
+    <!-- Road Stepper (Дорога по зупинках) -->
+    <div class="drv-stepper-card">
+      <div class="drv-stepper-header" onclick="toggleDrvTimelineExpand()">
+        <span class="drv-stepper-title">
+          <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+          <span>Зупинки рейсу</span>
+        </span>
+        <span class="drv-stepper-hint" id="drv-stepper-hint">згорнути ▴</span>
+      </div>
+      <div class="drv-stepper" id="drv-stepper">
+        <!-- Interactive stops list -->
+      </div>
     </div>
 
     <!-- Live Passenger Preview -->
     <div class="drv-preview-card">
-      <div class="drv-prev-title">Що бачать пасажири на зупинках:</div>
+      <div class="drv-prev-title">Що бачать пасажири:</div>
       <div class="drv-prev-content" id="drv-prev-content">
         Оберіть рейс або відзначте зупинку для трансляції пасажирам.
       </div>
@@ -1380,7 +1464,7 @@
     </svg>
     <span>Головна</span>
   </button>
-  <button class="bar-btn" id="tab-nav-driver" onclick="handleDriverBarBtn()" aria-label="Водію">
+  <button class="bar-btn" id="tab-nav-driver" onclick="handleDriverBarBtn()" aria-label="Водію" style="display:none;">
     <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
       <circle cx="12" cy="12" r="10"></circle>
       <circle cx="12" cy="12" r="3"></circle>
@@ -1489,6 +1573,13 @@
         <button class="btn-clear-cache" onclick="clearAppCache()">
           <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
           Очистити
+        </button>
+      </div>
+
+      <div class="driver-access-section" style="margin-top:24px;padding-top:16px;border-top:1px dashed var(--border);text-align:center;">
+        <p style="font-size:12px;color:var(--text-tertiary);margin-bottom:8px;">Ви водій рейсового автобуса?</p>
+        <button class="btn-driver-entry" onclick="closeModal('info-modal');openModal('driver-modal');" style="background:rgba(226,147,66,0.12);border:1px solid rgba(226,147,66,0.35);color:var(--accent);border-radius:9999px;padding:8px 18px;font-size:12.5px;font-weight:700;cursor:pointer;">
+          👨‍✈️ Увійти в Пульт водія
         </button>
       </div>
     </div>
@@ -1810,9 +1901,11 @@ function renderStops() {
     `;
   }).join('');
 
-  const si = getStopInfo();
-  const subEl = document.getElementById('header-sub');
-  if (subEl) subEl.textContent = `Посадка: ${si.name} (${si.sub})`;
+  if (!isDriverMode || driverViewMode === 'passenger') {
+    const si = getStopInfo();
+    const subEl = document.getElementById('header-sub');
+    if (subEl) subEl.textContent = `Посадка: ${si.name} (${si.sub})`;
+  }
 }
 
 function selectStop(id) {
@@ -2419,12 +2512,18 @@ function loginDriver() {
 }
 
 function applyDriverMode() {
+  const drvBtn = document.getElementById('tab-nav-driver');
+  const bar = document.getElementById('driver-mode-bar');
+  if (drvBtn) drvBtn.style.display = isDriverMode ? 'inline-flex' : 'none';
+  if (bar) bar.style.display = isDriverMode ? 'flex' : 'none';
+
   if (isDriverMode) {
     switchDriverView('cockpit');
   } else {
     switchDriverView('passenger');
   }
   syncBottomBarState();
+  updateDockIndicator();
 }
 
 let currentActiveTab = 'tab-nav-schedule';
@@ -2575,6 +2674,11 @@ function switchDriverView(mode) {
     if (pNotice) pNotice.style.display = 'none';
     if (drvCockpit) drvCockpit.style.display = 'none';
     if (passView) passView.style.display = 'block';
+    const brandH1 = document.getElementById('brand-title-h1');
+    const headerSub = document.getElementById('header-sub');
+    const si = getStopInfo();
+    if (brandH1) brandH1.innerHTML = `<span id="header-origin">${curDir === 'to-pidg' ? 'Тернопіль' : 'Підгородне'}</span> <span class="route-arrow" id="header-arrow">→</span> <span id="header-dest">${curDir === 'to-pidg' ? 'Підгородне' : 'Тернопіль'}</span>`;
+    if (headerSub) headerSub.textContent = `Посадка: ${si.name} (${si.sub})`;
     syncBottomBarState();
     return;
   }
@@ -2586,6 +2690,11 @@ function switchDriverView(mode) {
     if (pNotice) pNotice.style.display = 'none';
     if (drvCockpit) drvCockpit.style.display = 'block';
     if (passView) passView.style.display = 'none';
+    const brandH1 = document.getElementById('brand-title-h1');
+    const headerSub = document.getElementById('header-sub');
+    const r = routes[drvRoute] || { name: 'Підгородне' };
+    if (brandH1) brandH1.innerHTML = `<span>🚍 Пульт водія</span>`;
+    if (headerSub) headerSub.textContent = `${r.name} • ${drvSelectedTrip ? drvSelectedTrip.t : ''}`;
     renderDriverCockpit();
   } else {
     if (btnCockpit) btnCockpit.classList.remove('active');
@@ -2593,9 +2702,34 @@ function switchDriverView(mode) {
     if (pNotice) pNotice.style.display = 'flex';
     if (drvCockpit) drvCockpit.style.display = 'none';
     if (passView) passView.style.display = 'block';
+    const brandH1 = document.getElementById('brand-title-h1');
+    const headerSub = document.getElementById('header-sub');
+    const si = getStopInfo();
+    if (brandH1) brandH1.innerHTML = `<span id="header-origin">${curDir === 'to-pidg' ? 'Тернопіль' : 'Підгородне'}</span> <span class="route-arrow" id="header-arrow">→</span> <span id="header-dest">${curDir === 'to-pidg' ? 'Підгородне' : 'Тернопіль'}</span>`;
+    if (headerSub) headerSub.textContent = `Посадка: ${si.name} (${si.sub})`;
     updateAll();
   }
   syncBottomBarState();
+}
+
+let isDriverPickerOpen = false;
+function toggleDriverTripPicker() {
+  isDriverPickerOpen = !isDriverPickerOpen;
+  tgHaptic('selection');
+  const drawer = document.getElementById('drv-picker-drawer');
+  const btnText = document.getElementById('drv-picker-btn-text');
+  if (drawer) drawer.style.display = isDriverPickerOpen ? 'block' : 'none';
+  if (btnText) btnText.textContent = isDriverPickerOpen ? 'Згорнути ▴' : 'Змінити рейс ▾';
+}
+
+let isDrvTimelineExpanded = true;
+function toggleDrvTimelineExpand() {
+  isDrvTimelineExpanded = !isDrvTimelineExpanded;
+  tgHaptic('selection');
+  const stepper = document.getElementById('drv-stepper');
+  const hint = document.getElementById('drv-stepper-hint');
+  if (stepper) stepper.style.display = isDrvTimelineExpanded ? 'flex' : 'none';
+  if (hint) hint.textContent = isDrvTimelineExpanded ? 'згорнути ▴' : 'розгорнути ▾';
 }
 
 function setDriverRoute(routeKey) {
@@ -2607,6 +2741,7 @@ function setDriverRoute(routeKey) {
 
 function setDriverDirection(dir) {
   drvDir = dir;
+  tgHaptic('selection');
   autoPickDriverTrip();
   renderDriverCockpit();
 }
@@ -2635,6 +2770,12 @@ function selectDriverTrip(timeStr) {
   const found = trips.find(b => b.t === timeStr);
   if (found) {
     drvSelectedTrip = found;
+    // Auto-collapse picker after selection
+    isDriverPickerOpen = false;
+    const drawer = document.getElementById('drv-picker-drawer');
+    const btnText = document.getElementById('drv-picker-btn-text');
+    if (drawer) drawer.style.display = 'none';
+    if (btnText) btnText.textContent = 'Змінити рейс ▾';
     renderDriverCockpit();
   }
 }
@@ -2704,9 +2845,9 @@ function renderDriverCockpit() {
       const isDel = prog.status === 'delayed_10';
 
       let dot = '';
-      if (isCanc) dot = 'X';
+      if (isCanc) dot = '✕';
       else if (isDel) dot = '!';
-      else if (hasProg) dot = '.';
+      else if (hasProg) dot = '•';
 
       return `
         <button class="drv-trip-chip ${isSel ? 'active' : ''} ${hasProg ? 'has-progress' : ''} ${isCanc ? 'cancelled' : ''}" onclick="selectDriverTrip('${b.t}')">
@@ -2719,36 +2860,29 @@ function renderDriverCockpit() {
 
   if (!drvSelectedTrip) return;
 
-  // 5. Active Trip Card
-  const r = routes[drvRoute];
-  const tBadge = document.getElementById('drv-trip-badge');
-  const tDest = document.getElementById('drv-trip-dest');
-  const tStatusRow = document.getElementById('drv-trip-status-row');
-
-  if (tBadge) tBadge.textContent = `${drvSelectedTrip.t}`;
-  if (tDest) {
-    tDest.textContent = drvDir === 'to-pidg'
+  // 5. Active Trip Compact Bar
+  const r = routes[drvRoute] || { name: 'Підгородне' };
+  const atbTime = document.getElementById('drv-atb-time');
+  const atbRoute = document.getElementById('drv-atb-route');
+  const atbDir = document.getElementById('drv-atb-dir');
+  if (atbTime) atbTime.textContent = drvSelectedTrip ? drvSelectedTrip.t : '--:--';
+  if (atbRoute) atbRoute.textContent = r.name;
+  if (atbDir) {
+    atbDir.textContent = drvDir === 'to-pidg'
       ? `АС-2 (Тернопіль) ➔ ${r.name}`
       : `${r.name} ➔ АС-2 (Тернопіль)`;
   }
 
-  const tripProg = getDriverTripProgress(drvDir, drvSelectedTrip.t, drvSelectedTrip.r);
-  if (tStatusRow) {
-    if (tripProg.status === 'cancelled') {
-      tStatusRow.innerHTML = `<span class="badge badge-driver-cancel">РЕЙС СКАСОВАНО ВАМИ</span>`;
-    } else if (tripProg.status === 'delayed_10') {
-      tStatusRow.innerHTML = `<span class="badge badge-driver-delay">ПОВІДОМЛЕНО ПРО ЗАТРИМКУ (+5–10 ХВ)</span>`;
-    } else if (tripProg.status === 'ok' && tripProg.latestStop) {
-      tStatusRow.innerHTML = `<span class="badge badge-driver-ok">У ДОРОЗІ: щойно «${tripProg.latestStop}» (${tripProg.latestTime})</span>`;
-    } else {
-      tStatusRow.innerHTML = `<span style="font-size:12px;color:var(--text-tertiary);font-weight:600;">Рейс ще не розпочато</span>`;
-    }
-  }
+  // Update Header title for Driver
+  const brandH1 = document.getElementById('brand-title-h1');
+  const headerSub = document.getElementById('header-sub');
+  if (brandH1) brandH1.innerHTML = `<span>🚍 Пульт водія</span>`;
+  if (headerSub) headerSub.textContent = `${r.name} • ${drvSelectedTrip ? drvSelectedTrip.t : ''}`;
 
-  // 6. Stop Stepper (Дорога по зупинках)
+  // Target Stop & Focus Hero
   const stops = stopsConfig[drvDir];
   const baseMin = toMin(drvSelectedTrip.t);
-  const stepper = document.getElementById('drv-stepper');
+  const tripProg = getDriverTripProgress(drvDir, drvSelectedTrip.t, drvSelectedTrip.r);
 
   let targetStop = null;
   for (let s of stops) {
@@ -2758,6 +2892,32 @@ function renderDriverCockpit() {
     }
   }
 
+  const focusStopName = document.getElementById('drv-focus-stop-name');
+  const focusEta = document.getElementById('drv-focus-eta');
+  const tStatusRow = document.getElementById('drv-trip-status-row');
+
+  if (targetStop) {
+    if (focusStopName) focusStopName.textContent = `${targetStop.approx ? '~' : ''}${targetStop.name} (${targetStop.sub})`;
+    if (focusEta) focusEta.textContent = `~${toTime(baseMin + targetStop.offset)}`;
+  } else {
+    if (focusStopName) focusStopName.textContent = `🏁 Кінцева зупинка прибуття`;
+    if (focusEta) focusEta.textContent = `Рейс завершено`;
+  }
+
+  if (tStatusRow) {
+    if (tripProg.status === 'cancelled') {
+      tStatusRow.innerHTML = `<span class="badge badge-driver-cancel">РЕЙС СКАСОВАНО ВАМИ</span>`;
+    } else if (tripProg.status === 'delayed_10') {
+      tStatusRow.innerHTML = `<span class="badge badge-driver-delay">ПОВІДОМЛЕНО ПРО ЗАТРИМКУ (+5–10 ХВ)</span>`;
+    } else if (tripProg.status === 'ok' && tripProg.latestStop) {
+      tStatusRow.innerHTML = `<span class="badge badge-driver-ok">У ДОРОЗІ: щойно «${tripProg.latestStop}» (${tripProg.latestTime})</span>`;
+    } else {
+      tStatusRow.innerHTML = `<span style="font-size:12px;color:var(--text-tertiary);font-weight:600;">Рейс за розкладом</span>`;
+    }
+  }
+
+  // 6. Stop Stepper (Дорога по зупинках)
+  const stepper = document.getElementById('drv-stepper');
   const passedStops = stops.filter(s => Boolean(tripProg.passedMap[s.name]));
   const unpassedStops = stops.filter(s => !tripProg.passedMap[s.name]);
 
