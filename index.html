@@ -324,31 +324,72 @@
     .drv-prev-title { font-weight: 700; color: var(--text-tertiary); margin-bottom: 4px; font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.5px; }
     .drv-prev-content { color: var(--text); font-weight: 500; }
 
-    /* ── Direction Tabs (iOS 18 & Uber Capsule Segmented Control) ── */
-    .dir-tabs {
-      display: flex; gap: 4px; margin-bottom: 12px;
-      background: rgba(28, 22, 18, 0.78); padding: 4px;
-      border-radius: 9999px; border: 1px solid var(--border);
-      box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+    /* ── Direction Segmented Control (Apple Maps Style) ── */
+    .dir-segmented-control {
+      position: relative;
+      display: flex;
+      background: rgba(24, 19, 15, 0.88);
+      border: 1px solid rgba(255, 235, 220, 0.12);
+      border-radius: 16px;
+      padding: 4px;
+      margin-bottom: 14px;
+      gap: 4px;
+      box-shadow: 0 4px 18px rgba(0, 0, 0, 0.35), inset 0 1px 2px rgba(0, 0, 0, 0.5);
     }
-    .dir-tab {
-      flex: 1; background: transparent; border: 1px solid transparent;
-      border-radius: 9999px; padding: 8px 12px; cursor: pointer;
-      transition: all var(--f2-duration-fast) var(--f2-curve-decelerate-mid); text-align: center;
+    .dir-segment-indicator {
+      position: absolute;
+      top: 4px;
+      bottom: 4px;
+      left: 0;
+      width: calc(50% - 6px);
+      border-radius: 12px;
+      background: rgba(226, 147, 66, 0.18);
+      border: 1px solid rgba(226, 147, 66, 0.42);
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 235, 220, 0.22);
+      pointer-events: none;
+      transition: transform 0.32s var(--f2-curve-spatial), width 0.25s var(--f2-curve-spatial);
+      z-index: 1;
     }
-    .dir-tab:active {
+    .dir-seg-btn {
+      flex: 1;
+      position: relative;
+      z-index: 2;
+      background: transparent;
+      border: none;
+      border-radius: 12px;
+      padding: 10px 8px;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 2px;
+      color: var(--text-secondary);
+      transition: color var(--f2-duration-normal) var(--f2-curve-decelerate-mid), transform var(--f2-duration-fast) var(--f2-curve-easy-ease-max);
+    }
+    .dir-seg-btn:active {
       transform: scale(0.97);
-      transition: transform var(--f2-duration-fast) var(--f2-curve-easy-ease-max);
     }
-    .dir-tab .dir-label { font-size: 13px; font-weight: 600; color: var(--text-secondary); display: block; }
-    .dir-tab .dir-sub { font-size: 11px; color: var(--text-tertiary); margin-top: 1px; display: block; font-weight: 500; }
-    .dir-tab.active {
-      border-color: rgba(226, 147, 66, 0.32);
-      background: rgba(226, 147, 66, 0.14);
-      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 235, 220, 0.15);
+    .dir-seg-btn.active {
+      color: #ffffff;
     }
-    .dir-tab.active .dir-label { color: #ffffff; font-weight: 700; }
-    .dir-tab.active .dir-sub { color: var(--accent); font-weight: 600; }
+    .dir-seg-title {
+      font-size: 13.5px;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      letter-spacing: -0.2px;
+    }
+    .dir-seg-sub {
+      font-size: 11px;
+      color: var(--text-tertiary);
+      font-weight: 500;
+    }
+    .dir-seg-btn.active .dir-seg-sub {
+      color: var(--accent);
+      font-weight: 600;
+    }
 
     /* ── Common Filter Section Labels ── */
     .filter-group { margin-bottom: 12px; }
@@ -387,29 +428,48 @@
     }
     .stop-chip.active .stop-sub { color: var(--text-secondary); }
 
-    /* ── Next Bus Card (Hero Component) ── */
+    /* ── Next Bus Card (Transit / Flighty Hierarchy) ── */
     .next-card {
       background: var(--surface); backdrop-filter: var(--glass-blur);
       -webkit-backdrop-filter: var(--glass-blur);
       border: 1px solid var(--border); border-radius: var(--radius-lg);
-      padding: 18px 18px 16px 18px; margin-bottom: 16px; position: relative;
+      padding: 16px 16px 14px 16px; margin-bottom: 16px; position: relative;
       box-shadow: var(--shadow-card);
-      background-image: radial-gradient(circle at 10% 10%, rgba(16, 185, 129, 0.08) 0%, transparent 65%);
+      background-image: radial-gradient(circle at 10% 10%, rgba(226, 147, 66, 0.07) 0%, transparent 65%);
+    }
+    .next-card-top-row {
+      display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;
     }
     .next-card-header {
-      font-size: 11px; font-weight: 700; color: var(--text-tertiary);
-      text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 8px;
+      font-size: 11px; font-weight: 800; color: var(--text-tertiary);
+      text-transform: uppercase; letter-spacing: 0.6px;
     }
-    .next-card-main {
-      display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;
+    .hero-time-hero {
+      display: flex; flex-direction: column; gap: 4px; margin-bottom: 4px;
     }
-    .next-card-time {
-      font-size: 42px; font-weight: 800; letter-spacing: -1.5px;
-      color: var(--text); font-variant-numeric: tabular-nums; line-height: 1;
+    .hero-rel-wrap {
+      display: flex; align-items: baseline; justify-content: space-between; gap: 8px;
     }
+    .hero-rel-val {
+      font-size: 34px; font-weight: 800; color: #ffffff;
+      letter-spacing: -1.2px; line-height: 1.05; font-variant-numeric: tabular-nums;
+    }
+    .hero-exact-row {
+      display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--text-secondary);
+      flex-wrap: wrap;
+    }
+    .hero-exact-clock {
+      font-weight: 700; color: var(--text-warm); font-variant-numeric: tabular-nums;
+      display: inline-flex; align-items: center; gap: 4px;
+    }
+    .hero-exact-stop {
+      font-size: 12px; color: var(--text-tertiary);
+    }
+
     .countdown-badge {
-      font-size: 13.5px; font-weight: 800; padding: 6px 14px;
+      font-size: 13px; font-weight: 800; padding: 5px 12px;
       border-radius: 20px; line-height: 1; font-variant-numeric: tabular-nums;
+      white-space: nowrap;
     }
     .cd-soon {
       background: var(--green-soft); color: var(--green); border: 1px solid rgba(16, 185, 129, 0.3);
@@ -429,8 +489,18 @@
       border: 1px solid var(--border);
     }
 
-    .next-card-route {
-      display: flex; align-items: center; gap: 8px; font-size: 14.5px; font-weight: 700; margin-bottom: 12px;
+    /* ── Departure Progress Bar ── */
+    .hero-progress-track {
+      width: 100%; height: 4px; background: rgba(255, 235, 220, 0.08);
+      border-radius: 9999px; overflow: hidden; margin: 10px 0 12px 0;
+    }
+    .hero-progress-fill {
+      height: 100%; width: 0%;
+      background: linear-gradient(90deg, #2ec477, var(--accent));
+      border-radius: 9999px; transition: width 0.6s var(--f2-curve-spatial);
+    }
+    .hero-progress-fill.urgent {
+      background: linear-gradient(90deg, var(--yellow), var(--red));
     }
 
     /* Live status badge */
@@ -464,13 +534,77 @@
       border: 1px solid rgba(244, 63, 94, 0.3);
     }
 
-    .next-card-details {
-      background: rgba(255, 255, 255, 0.04); border-radius: 12px;
-      padding: 11px 14px; font-size: 13px; color: var(--text-secondary);
-      display: flex; flex-direction: column; gap: 7px; border: 1px solid rgba(255, 255, 255, 0.04);
+    /* ── Live Route Stop-by-Stop Ladder ── */
+    .route-ladder-container {
+      background: rgba(28, 22, 18, 0.55); border: 1px solid var(--border);
+      border-radius: 14px; padding: 10px 12px; margin: 10px 0 12px 0;
     }
-    .detail-row { display: flex; justify-content: space-between; align-items: center; }
-    .detail-row strong { color: var(--text); font-weight: 700; font-variant-numeric: tabular-nums; }
+    .ladder-header {
+      display: flex; justify-content: space-between; align-items: center;
+      cursor: pointer; user-select: none;
+    }
+    .ladder-title {
+      font-size: 11.5px; font-weight: 700; color: var(--text-secondary);
+      display: inline-flex; align-items: center; gap: 6px; text-transform: uppercase; letter-spacing: 0.5px;
+    }
+    .ladder-expand-hint { font-size: 11px; color: var(--accent); font-weight: 600; }
+    .route-ladder {
+      display: flex; flex-direction: column; gap: 0; margin-top: 10px; padding-left: 6px;
+    }
+    .ladder-step {
+      display: flex; align-items: flex-start; gap: 12px; position: relative; padding-bottom: 12px;
+    }
+    .ladder-step:last-child { padding-bottom: 0; }
+    .ladder-spine {
+      display: flex; flex-direction: column; align-items: center; position: relative;
+      width: 16px; flex-shrink: 0;
+    }
+    .ladder-dot {
+      width: 12px; height: 12px; border-radius: 50%;
+      background: var(--surface-raised); border: 2px solid var(--border);
+      z-index: 2; transition: all 0.2s ease;
+    }
+    .ladder-step.passed .ladder-dot {
+      background: #2ec477; border-color: #2ec477; box-shadow: 0 0 8px rgba(46, 196, 119, 0.4);
+    }
+    .ladder-step.current .ladder-dot {
+      background: #2ec477; border-color: #ffffff; box-shadow: 0 0 0 4px rgba(46, 196, 119, 0.25);
+      animation: ladderPulse 1.6s infinite;
+    }
+    @keyframes ladderPulse {
+      0% { box-shadow: 0 0 0 0 rgba(46, 196, 119, 0.5); }
+      70% { box-shadow: 0 0 0 6px rgba(46, 196, 119, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(46, 196, 119, 0); }
+    }
+    .ladder-step.my-stop .ladder-dot {
+      border-color: var(--accent); background: var(--accent); box-shadow: 0 0 10px rgba(226, 147, 66, 0.45);
+    }
+    .ladder-line {
+      position: absolute; top: 12px; bottom: -4px; width: 2px;
+      background: rgba(255, 235, 220, 0.1); z-index: 1;
+    }
+    .ladder-step.passed .ladder-line { background: rgba(46, 196, 119, 0.6); }
+    .ladder-step:last-child .ladder-line { display: none; }
+    .ladder-info {
+      flex: 1; display: flex; justify-content: space-between; align-items: center; line-height: 1.2;
+    }
+    .ladder-name-wrap {
+      display: flex; align-items: center; gap: 6px; flex-wrap: wrap;
+    }
+    .ladder-name { font-size: 12.5px; font-weight: 600; color: var(--text-secondary); }
+    .ladder-step.passed .ladder-name { color: var(--text-tertiary); }
+    .ladder-step.current .ladder-name { color: #ffffff; font-weight: 700; }
+    .ladder-step.my-stop .ladder-name { color: var(--accent); font-weight: 800; }
+    .ladder-badge {
+      font-size: 9.5px; font-weight: 700; padding: 1.5px 6px; border-radius: 9999px;
+      background: rgba(226, 147, 66, 0.18); color: var(--accent); border: 1px solid rgba(226, 147, 66, 0.35);
+    }
+    .ladder-time {
+      font-size: 12px; font-weight: 700; font-variant-numeric: tabular-nums; color: var(--text-secondary);
+    }
+    .ladder-step.passed .ladder-time { color: var(--text-tertiary); }
+    .ladder-step.current .ladder-time { color: #2ec477; }
+    .ladder-step.my-stop .ladder-time { color: var(--accent); }
 
     /* Action Buttons row (Status Report, Share, Calendar) */
     .next-card-actions {
@@ -499,18 +633,41 @@
       font-weight: 700; cursor: pointer; text-decoration: underline;
     }
 
-    .next-card-footer {
-      margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--border);
-      font-size: 13px; color: var(--text-tertiary);
-      display: flex; justify-content: space-between; align-items: center;
+    /* ── Upcoming Departures Micro-Feed ── */
+    .hero-upcoming-section {
+      margin-top: 12px; padding-top: 11px; border-top: 1px solid var(--border);
     }
-    .hero-following-val {
-      display: inline-flex; align-items: center; gap: 8px;
+    .hero-upcoming-title {
+      font-size: 10.5px; font-weight: 800; color: var(--text-tertiary);
+      text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 7px;
     }
-    .hero-following-time {
-      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      font-size: 14px; font-weight: 700; color: var(--text-warm);
-      font-variant-numeric: tabular-nums; letter-spacing: -0.2px;
+    .hero-upcoming-chips {
+      display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; padding-bottom: 2px;
+    }
+    .hero-upcoming-chips::-webkit-scrollbar { display: none; }
+    .hero-up-chip {
+      background: rgba(255, 235, 220, 0.05); border: 1px solid var(--border);
+      border-radius: 12px; padding: 6px 10px; display: inline-flex; align-items: center;
+      gap: 7px; cursor: pointer; white-space: nowrap;
+      transition: all var(--f2-duration-fast) var(--f2-curve-decelerate-mid);
+    }
+    .hero-up-chip:active {
+      transform: scale(0.96); background: rgba(255, 235, 220, 0.1);
+    }
+    .hero-up-time {
+      font-size: 13.5px; font-weight: 800; color: var(--text); font-variant-numeric: tabular-nums;
+    }
+    .hero-up-rel {
+      font-size: 11px; color: var(--accent); font-weight: 600;
+    }
+
+    /* ── Sheet Drag Handle ── */
+    .sheet-drag-handle-bar {
+      width: 100%; display: flex; justify-content: center; padding: 0 0 12px 0;
+      cursor: grab; touch-action: none;
+    }
+    .sheet-drag-handle {
+      width: 38px; height: 4.5px; border-radius: 9999px; background: rgba(255, 235, 220, 0.28);
     }
 
     /* ── Filter Chips ── */
@@ -605,6 +762,26 @@
     .bus-time {
       font-size: 19px; font-weight: 800; font-variant-numeric: tabular-nums;
       color: var(--text); letter-spacing: -0.4px; line-height: 1.1;
+    }
+    .bus-time-delayed-wrap {
+      display: inline-flex; align-items: baseline; gap: 5px;
+    }
+    .bus-time-struck {
+      font-size: 14px; color: var(--text-tertiary); text-decoration: line-through;
+      font-variant-numeric: tabular-nums;
+    }
+    .bus-time-new {
+      font-size: 19px; font-weight: 800; color: var(--yellow);
+      font-variant-numeric: tabular-nums; letter-spacing: -0.4px; line-height: 1.1;
+    }
+    .bus-delay-tag {
+      font-size: 10px; font-weight: 700; color: var(--yellow); background: var(--yellow-soft);
+      border: 1px solid rgba(245, 158, 11, 0.3); padding: 1px 5px; border-radius: 6px; line-height: 1.2;
+    }
+    .bus-cancelled-tag {
+      font-size: 10.5px; font-weight: 800; color: var(--red); background: var(--red-soft);
+      border: 1px solid rgba(244, 63, 94, 0.3); padding: 1px 6px; border-radius: 6px; line-height: 1.2;
+      display: inline-block; margin-top: 2px;
     }
     .bus-subtime { font-size: 11.5px; color: var(--accent); font-weight: 600; margin-top: 1px; }
     .bus-right { text-align: right; display: flex; flex-direction: column; align-items: flex-end; gap: 2px; }
@@ -1077,15 +1254,22 @@
 
   <!-- ══════════ PASSENGER VIEW ══════════ -->
   <div id="passenger-view">
-    <!-- Direction Tabs -->
-    <div class="dir-tabs">
-      <button class="dir-tab active" id="btn-dir-to-pidg" onclick="setDirection('to-pidg')">
-        <span class="dir-label">З Тернополя</span>
-        <span class="dir-sub" id="dir-sub-to-pidg">→ Підгородне</span>
+    <!-- Direction Segmented Control (Apple Maps Style) -->
+    <div class="dir-segmented-control" role="tablist" aria-label="Напрямок руху">
+      <div class="dir-segment-indicator" id="dir-segment-indicator"></div>
+      <button class="dir-seg-btn active" id="btn-dir-to-pidg" role="tab" onclick="setDirection('to-pidg')">
+        <span class="dir-seg-title">
+          <span>До Підгородного</span>
+          <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+        </span>
+        <span class="dir-seg-sub" id="dir-sub-to-pidg">з Тернополя (АС-2)</span>
       </button>
-      <button class="dir-tab" id="btn-dir-to-tern" onclick="setDirection('to-tern')">
-        <span class="dir-label">З Підгородного</span>
-        <span class="dir-sub" id="dir-sub-to-tern">→ Тернопіль</span>
+      <button class="dir-seg-btn" id="btn-dir-to-tern" role="tab" onclick="setDirection('to-tern')">
+        <span class="dir-seg-title">
+          <span>До Тернополя</span>
+          <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+        </span>
+        <span class="dir-seg-sub" id="dir-sub-to-tern">з Підгородного</span>
       </button>
     </div>
 
@@ -1113,34 +1297,57 @@
       <div class="stop-row" id="stop-row"></div>
     </div>
 
-    <!-- Next Bus Card -->
+    <!-- Next Bus Card (Transit / Flighty Hierarchy) -->
     <div class="next-card" id="hero-card">
-      <div class="next-card-header" id="hero-label">Найближчий автобус</div>
-      <div class="next-card-main">
-        <div class="next-card-time" id="hero-time">--:--</div>
-        <span class="countdown-badge cd-soon" id="hero-countdown">...</span>
+      <div class="next-card-top-row">
+        <span class="next-card-header" id="hero-label">НАЙБЛИЖЧИЙ АВТОБУС</span>
+        <div id="hero-route"></div>
       </div>
-      <div class="next-card-route" id="hero-route">
-        <span class="pill pill-pidg"><span class="pill-dot"></span>Підгородне</span>
+
+      <!-- Hero Main: Relative Countdown Prominent, Absolute Time Subtitle -->
+      <div class="hero-time-hero">
+        <div class="hero-rel-wrap">
+          <span class="hero-rel-val" id="hero-rel-time">--:--</span>
+          <span class="countdown-badge cd-soon" id="hero-countdown-badge">...</span>
+        </div>
+        <div class="hero-exact-row">
+          <span class="hero-exact-clock" id="hero-exact-clock">🕒 --:--</span>
+          <span class="hero-exact-stop" id="hero-exact-stop">посадка на зупинці</span>
+        </div>
+      </div>
+
+      <!-- Departure Urgency Progress Bar -->
+      <div class="hero-progress-track">
+        <div class="hero-progress-fill" id="hero-progress-fill"></div>
       </div>
 
       <!-- Dynamic Status Badge (Driver / Crowd) -->
       <div id="hero-status-container"></div>
 
-      <div class="next-card-details" id="hero-details"></div>
+      <!-- Live Route Stop-by-Stop Ladder (Interactive Timeline) -->
+      <div class="route-ladder-container">
+        <div class="ladder-header" onclick="toggleLadderExpand()">
+          <span class="ladder-title">
+            <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+            <span>Зупинки та графік рейсу:</span>
+          </span>
+          <span class="ladder-expand-hint" id="ladder-expand-hint">розгорнути ▾</span>
+        </div>
+        <div class="route-ladder" id="hero-route-ladder" style="display:none;"></div>
+      </div>
 
       <!-- Action Buttons (Report status, Share, Calendar) -->
       <div class="next-card-actions" id="hero-actions">
         <button class="card-act-btn highlight" onclick="openModal('report-modal')">
-          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
           <span>Повідомити</span>
         </button>
         <button class="card-act-btn" onclick="shareBusTrip()">
-          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
           <span>Поділитися</span>
         </button>
         <button class="card-act-btn" onclick="addTripToCalendar()">
-          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
           <span>Календар</span>
         </button>
       </div>
@@ -1151,9 +1358,10 @@
         <button class="undo-btn" onclick="undoMyReport()">Скасувати</button>
       </div>
 
-      <div class="next-card-footer" id="hero-footer">
-        <span>Наступний:</span>
-        <span class="hero-following-val" id="hero-following">--:--</span>
+      <!-- Upcoming Departures Micro-Feed (Citymapper Pattern) -->
+      <div class="hero-upcoming-section">
+        <div class="hero-upcoming-title">НАСТУПНІ РЕЙСИ:</div>
+        <div class="hero-upcoming-chips" id="hero-upcoming-chips"></div>
       </div>
     </div>
 
@@ -1202,6 +1410,7 @@
 <!-- Passenger Report Modal (Friendly crowd options) -->
 <div class="modal-overlay" id="report-modal" onclick="closeOnBg(event, 'report-modal')">
   <div class="modal-sheet">
+    <div class="sheet-drag-handle-bar"><div class="sheet-drag-handle"></div></div>
     <div class="modal-top">
       <h3>Повідомити статус</h3>
       <button class="modal-x" onclick="closeModal('report-modal')">✕</button>
@@ -1245,6 +1454,7 @@
 <!-- Info Modal -->
 <div class="modal-overlay" id="info-modal" onclick="closeOnBg(event, 'info-modal')">
   <div class="modal-sheet">
+    <div class="sheet-drag-handle-bar"><div class="sheet-drag-handle"></div></div>
     <div class="modal-top">
       <h3>Як їздять автобуси</h3>
       <button class="modal-x" onclick="closeModal('info-modal')">✕</button>
@@ -1288,6 +1498,7 @@
 <!-- Driver Login Modal -->
 <div class="modal-overlay" id="driver-modal" onclick="closeOnBg(event, 'driver-modal')">
   <div class="modal-sheet">
+    <div class="sheet-drag-handle-bar"><div class="sheet-drag-handle"></div></div>
     <div class="modal-top">
       <h3>Авторизація водія</h3>
       <button class="modal-x" onclick="closeModal('driver-modal')">✕</button>
@@ -1307,6 +1518,7 @@
 <!-- Install Modal (PWA Installation Hub) -->
 <div class="modal-overlay" id="install-modal" onclick="closeOnBg(event, 'install-modal')">
   <div class="modal-sheet">
+    <div class="sheet-drag-handle-bar"><div class="sheet-drag-handle"></div></div>
     <div class="modal-top">
       <div style="display:flex;align-items:center;gap:12px;">
         <img src="/bus/icon-192.png" alt="Іконка" style="width:38px;height:38px;border-radius:10px;border:1px solid rgba(226,147,66,0.35);box-shadow:0 4px 12px rgba(0,0,0,0.5);">
@@ -1437,10 +1649,38 @@ const scheduleToTern = [
   {t:"19:45",r:"pidg"},{t:"19:50",r:"drag"},{t:"20:05",r:"zab"}
 ];
 
-// ── State ──
+// ── Telegram Haptic & State ──
+function tgHaptic(type = 'light') {
+  try {
+    if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.HapticFeedback) {
+      const hf = window.Telegram.WebApp.HapticFeedback;
+      if (type === 'selection') hf.selectionChanged();
+      else if (type === 'success' || type === 'warning' || type === 'error') hf.notificationOccurred(type);
+      else hf.impactOccurred(type);
+      return;
+    }
+  } catch(e) {}
+  if (navigator.vibrate) {
+    try {
+      if (type === 'selection') navigator.vibrate(8);
+      else if (type === 'success') navigator.vibrate([15, 30, 20]);
+      else navigator.vibrate(15);
+    } catch(e) {}
+  }
+}
+
 let curDir = 'to-pidg';
 let curFilter = 'all';
 let selectedStops = { 'to-pidg': 'mcdonalds', 'to-tern': 'nizhnya' };
+try {
+  const savedStops = localStorage.getItem('selectedStops_v2');
+  if (savedStops) {
+    const parsed = JSON.parse(savedStops);
+    if (parsed['to-pidg']) selectedStops['to-pidg'] = parsed['to-pidg'];
+    if (parsed['to-tern']) selectedStops['to-tern'] = parsed['to-tern'];
+  }
+} catch(e) {}
+
 let liveReports = [];
 let isDriverMode = localStorage.getItem('isDriverMode') === 'true';
 let driverPin = localStorage.getItem('driverPin') || '';
@@ -1559,27 +1799,55 @@ function renderStops() {
   const row = document.getElementById('stop-row');
   const stops = stopsConfig[curDir];
   const sel = selectedStops[curDir];
-  row.innerHTML = stops.map(s => `
-    <button class="stop-chip ${s.id === sel ? 'active' : ''}" onclick="selectStop('${s.id}')">
-      <span class="stop-name">${s.approx ? '~' : ''}${s.name}</span>
-      <span class="stop-sub">${s.sub}</span>
-    </button>
-  `).join('');
+  row.innerHTML = stops.map(s => {
+    const isSel = s.id === sel;
+    const offsetLabel = s.offset === 0 ? 'початок' : `+${s.offset}хв`;
+    return `
+      <button class="stop-chip ${isSel ? 'active' : ''}" onclick="selectStop('${s.id}')">
+        <span class="stop-name">${s.approx ? '~' : ''}${s.name}</span>
+        <span class="stop-sub">${s.sub} (${offsetLabel})</span>
+      </button>
+    `;
+  }).join('');
 
   const si = getStopInfo();
-  document.getElementById('header-sub').textContent = `Посадка: ${si.name} (${si.sub})`;
+  const subEl = document.getElementById('header-sub');
+  if (subEl) subEl.textContent = `Посадка: ${si.name} (${si.sub})`;
 }
 
 function selectStop(id) {
   selectedStops[curDir] = id;
+  try {
+    localStorage.setItem('selectedStops_v2', JSON.stringify(selectedStops));
+  } catch(e) {}
+  tgHaptic('selection');
   renderStops();
   updateAll();
 }
 
+function updateDirIndicator() {
+  requestAnimationFrame(() => {
+    const bar = document.querySelector('.dir-segmented-control');
+    const ind = document.getElementById('dir-segment-indicator');
+    const activeBtn = document.querySelector('.dir-seg-btn.active');
+    if (!bar || !ind || !activeBtn) return;
+    const barRect = bar.getBoundingClientRect();
+    const btnRect = activeBtn.getBoundingClientRect();
+    const left = btnRect.left - barRect.left;
+    const width = btnRect.width;
+    ind.style.transform = `translateX(${left}px)`;
+    ind.style.width = `${width}px`;
+  });
+}
+
 function setDirection(dir) {
   curDir = dir;
-  document.getElementById('btn-dir-to-pidg').classList.toggle('active', dir === 'to-pidg');
-  document.getElementById('btn-dir-to-tern').classList.toggle('active', dir === 'to-tern');
+  tgHaptic('selection');
+  const bPidg = document.getElementById('btn-dir-to-pidg');
+  const bTern = document.getElementById('btn-dir-to-tern');
+  if (bPidg) bPidg.classList.toggle('active', dir === 'to-pidg');
+  if (bTern) bTern.classList.toggle('active', dir === 'to-tern');
+  updateDirIndicator();
 
   const origEl = document.getElementById('header-origin');
   const destEl = document.getElementById('header-dest');
@@ -1599,6 +1867,7 @@ function setDirection(dir) {
 
 function setFilter(f, el) {
   curFilter = f;
+  tgHaptic('selection');
   document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
   if (el) el.classList.add('active');
   renderSchedule();
@@ -1616,13 +1885,14 @@ function getList() {
   return raw.filter(b => b.r === curFilter);
 }
 
-// Auto-skip cancelled trips in hero countdown for passengers
+// Auto-skip cancelled trips in hero countdown for passengers & return upcoming departures
 function findNext() {
   const now = new Date();
   const cur = now.getHours()*60 + now.getMinutes();
   const list = getList();
   const offset = getStopOffset();
-  let next = null, following = null, tomorrow = false;
+  let next = null, tomorrow = false;
+  const upcoming = [];
 
   const validTrips = isDriverMode ? list : list.filter(b => !isTripCancelled(curDir, b.t, b.r));
   const pool = validTrips.length ? validTrips : list;
@@ -1631,16 +1901,20 @@ function findNext() {
     const atStop = toMin(pool[i].t) + offset;
     if (atStop >= cur) {
       next = pool[i];
-      following = pool[i+1] || null;
+      for (let j = i + 1; j < Math.min(i + 4, pool.length); j++) {
+        upcoming.push(pool[j]);
+      }
       break;
     }
   }
   if (!next && pool.length) {
     next = pool[0];
-    following = pool[1] || null;
     tomorrow = true;
+    for (let j = 1; j < Math.min(4, pool.length); j++) {
+      upcoming.push(pool[j]);
+    }
   }
-  return { next, following, tomorrow, cur };
+  return { next, following: upcoming[0] || null, upcoming, tomorrow, cur };
 }
 
 // ── Hero Status Badge Update ──
@@ -1660,84 +1934,186 @@ function updateHeroStatus() {
     if (rep.status === 'ok') {
       const stopStr = rep.stop_name && rep.stop_name !== 'base'
         ? `проїхав «${rep.stop_name}» ${timeStr ? '(' + timeStr + ')' : ''}`
-        : 'підтвердив виїзд';
-      container.innerHTML = `<div class="status-badge badge-driver-ok">🟢 Водій: ${stopStr}</div>`;
+        : 'підтвердив виїзд на лінію';
+      container.innerHTML = `<div class="status-badge badge-driver-ok">👨‍✈️ Офіційно від водія: ${stopStr}</div>`;
     } else if (rep.status === 'cancelled') {
       container.innerHTML = `<div class="status-badge badge-driver-cancel">❌ Водій: рейс скасовано</div>`;
     } else if (rep.status === 'delayed_10') {
-      container.innerHTML = `<div class="status-badge badge-driver-delay">⏳ Водій: затримка +5–10 хв ${timeStr ? '(' + timeStr + ')' : ''}</div>`;
+      container.innerHTML = `<div class="status-badge badge-driver-delay">⏳ Водій повідомляє: затримка +5–10 хв ${timeStr ? '(' + timeStr + ')' : ''}</div>`;
     }
   } else if (rep.report_type === 'passenger') {
     if (rep.status === 'seen') {
-      container.innerHTML = `<div class="status-badge badge-seen">🟢 Пасажири бачили автобус (їде)</div>`;
+      container.innerHTML = `<div class="status-badge badge-seen">👥 Пасажири на зупинці: автобус їде / на лінії</div>`;
     } else if (rep.status === 'delayed') {
-      container.innerHTML = `<div class="status-badge badge-delayed">⏳ Пасажири повідомляють: затримка 2–5 хв</div>`;
+      container.innerHTML = `<div class="status-badge badge-delayed">👥 Пасажири повідомляють: затримка ~2–5 хв</div>`;
     } else if (rep.status === 'missing') {
       container.innerHTML = `<div class="status-badge badge-missing">❓ На зупинці ще очікують автобус</div>`;
     }
   }
 }
 
+let isLadderExpanded = false;
+function toggleLadderExpand() {
+  isLadderExpanded = !isLadderExpanded;
+  tgHaptic('selection');
+  const ladder = document.getElementById('hero-route-ladder');
+  const hint = document.getElementById('ladder-expand-hint');
+  if (ladder) ladder.style.display = isLadderExpanded ? 'flex' : 'none';
+  if (hint) hint.textContent = isLadderExpanded ? 'згорнути ▴' : 'розгорнути ▾';
+}
+
+function renderRouteLadder(trip) {
+  const ladder = document.getElementById('hero-route-ladder');
+  if (!ladder || !trip) return;
+
+  const stops = stopsConfig[curDir];
+  const tripProg = getDriverTripProgress(curDir, trip.t, trip.r);
+  const baseMin = toMin(trip.t);
+  const myStopId = selectedStops[curDir];
+
+  let foundCurrent = false;
+  let html = '';
+
+  stops.forEach((s, idx) => {
+    const isPassed = Boolean(tripProg.passedMap[s.name]);
+    const isMyStop = s.id === myStopId;
+    let isCurrent = false;
+
+    if (!isPassed && !foundCurrent && (tripProg.status === 'ok' || Object.keys(tripProg.passedMap).length > 0)) {
+      isCurrent = true;
+      foundCurrent = true;
+    }
+
+    const t = toTime(baseMin + s.offset);
+    const passTime = tripProg.passedMap[s.name];
+
+    let stepClass = 'ladder-step';
+    if (isPassed) stepClass += ' passed';
+    if (isCurrent) stepClass += ' current';
+    if (isMyStop) stepClass += ' my-stop';
+
+    html += `
+      <div class="${stepClass}">
+        <div class="ladder-spine">
+          <div class="ladder-dot"></div>
+          <div class="ladder-line"></div>
+        </div>
+        <div class="ladder-info">
+          <div class="ladder-name-wrap">
+            <span class="ladder-name">${s.name}</span>
+            ${isMyStop ? '<span class="ladder-badge">Ваша посадка</span>' : ''}
+            ${isCurrent ? '<span class="ladder-badge" style="background:rgba(46,196,119,0.2);color:#2ec477;border-color:rgba(46,196,119,0.35);">Наступна</span>' : ''}
+          </div>
+          <span class="ladder-time">${isPassed ? `✓ ${passTime}` : (s.approx ? '~' : '') + t}</span>
+        </div>
+      </div>
+    `;
+  });
+
+  ladder.innerHTML = html;
+}
+
+function scrollToTrip(timeStr) {
+  tgHaptic('light');
+  const allRows = document.querySelectorAll('.bus-row');
+  for (let row of allRows) {
+    if (row.textContent.includes(timeStr)) {
+      row.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      row.style.boxShadow = '0 0 0 2px var(--accent)';
+      setTimeout(() => { row.style.boxShadow = ''; }, 1600);
+      break;
+    }
+  }
+}
+
 // ── Hero Card ──
 function updateHero() {
-  const { next, following, tomorrow, cur } = findNext();
+  const { next, following, upcoming, tomorrow, cur } = findNext();
   if (!next) return;
 
   const r = routes[next.r];
   const atStop = busMinAtStop(next);
   let diff = tomorrow ? (1440 - cur + atStop) : (atStop - cur);
 
-  document.getElementById('hero-time').textContent = busTimeAtStop(next);
-  document.getElementById('hero-label').textContent = tomorrow ? 'Перший автобус завтра' : 'Найближчий автобус';
-
-  const cd = document.getElementById('hero-countdown');
-  if (diff === 0) {
-    cd.textContent = 'зараз!'; cd.className = 'countdown-badge cd-urgent';
-  } else if (diff < 60) {
-    cd.textContent = `${diff} хв`;
-    cd.className = diff <= 10 ? 'countdown-badge cd-urgent' : 'countdown-badge cd-soon';
-  } else {
-    cd.textContent = `${Math.floor(diff/60)} год ${diff%60} хв`;
-    cd.className = 'countdown-badge cd-far';
+  // 1. Relative countdown as prominent title
+  const relValEl = document.getElementById('hero-rel-time');
+  if (relValEl) {
+    if (diff <= 0) relValEl.textContent = 'відправляється зараз!';
+    else if (diff === 1) relValEl.textContent = 'через 1 хвилину';
+    else if (diff < 60) relValEl.textContent = `через ${diff} хв`;
+    else relValEl.textContent = `через ${Math.floor(diff/60)} год ${diff%60} хв`;
   }
 
+  // 2. Countdown Badge
+  const cdBadge = document.getElementById('hero-countdown-badge');
+  if (cdBadge) {
+    if (diff <= 5) {
+      cdBadge.textContent = 'терміново';
+      cdBadge.className = 'countdown-badge cd-urgent';
+    } else if (diff <= 20) {
+      cdBadge.textContent = 'скоро';
+      cdBadge.className = 'countdown-badge cd-soon';
+    } else {
+      cdBadge.textContent = 'за розкладом';
+      cdBadge.className = 'countdown-badge cd-far';
+    }
+  }
+
+  // 3. Progress fill
+  const progressFill = document.getElementById('hero-progress-fill');
+  if (progressFill) {
+    const pct = Math.max(4, Math.min(100, Math.round(((30 - Math.min(30, diff)) / 30) * 100)));
+    progressFill.style.width = `${pct}%`;
+    progressFill.classList.toggle('urgent', diff <= 10);
+  }
+
+  // 4. Exact departure time with delay detection
+  const normalTime = busTimeAtStop(next);
+  const rep = getResolvedTripReport(curDir, next.t, next.r);
+  const isDelayed = rep && (rep.status === 'delayed_10' || rep.status === 'delayed');
+  const delayMins = rep && rep.status === 'delayed_10' ? 10 : 4;
+  const delayedTime = toTime(toMin(normalTime) + delayMins);
+
+  const clockEl = document.getElementById('hero-exact-clock');
+  if (clockEl) {
+    if (isDelayed) {
+      clockEl.innerHTML = `<span class="bus-time-struck">${normalTime}</span> <span style="color:var(--yellow);font-weight:800;">➔ ${delayedTime} (+${delayMins} хв)</span>`;
+    } else {
+      clockEl.innerHTML = `<span>🕒 о ${normalTime}</span>`;
+    }
+  }
+
+  const stopInfo = getStopInfo();
+  const stopEl = document.getElementById('hero-exact-stop');
+  if (stopEl) stopEl.textContent = `• посадка: «${stopInfo.name}»`;
+
+  document.getElementById('hero-label').textContent = tomorrow ? 'ПЕРШИЙ АВТОБУС ЗАВТРА' : 'НАЙБЛИЖЧИЙ АВТОБУС';
   document.getElementById('hero-route').innerHTML = `
     <span class="pill ${r.pill}"><span class="pill-dot"></span><span>${r.name}</span></span>`;
 
   updateHeroStatus();
+  renderRouteLadder(next);
 
-  const details = document.getElementById('hero-details');
-  const stops = stopsConfig[curDir];
-  const baseMin = toMin(next.t);
-  let detailsHtml = '';
-
-  const keyStopIds = curDir === 'to-pidg'
-    ? ['as2', 'zbruch', 'mcdonalds', 'berezhanska', 'nizhnya']
-    : ['nizhnya', 'berezhanska', 'mcdonalds', 'zbruch', 'as2'];
-
-  keyStopIds.forEach(sid => {
-    const s = stops.find(x => x.id === sid);
-    if (!s) return;
-    const t = toTime(baseMin + s.offset);
-    const prefix = s.approx ? '~' : '';
-    const isMy = sid === selectedStops[curDir];
-    detailsHtml += `<div class="detail-row">
-      <span style="display:inline-flex;align-items:center;gap:6px;">
-        <span style="width:6px;height:6px;border-radius:50%;background:${isMy ? 'var(--accent)' : 'var(--border-light)'};"></span>
-        ${s.name}
-      </span>
-      <strong${isMy ? ' style="color:var(--accent)"' : ''}>${prefix}${t}</strong>
-    </div>`;
-  });
-
-  details.innerHTML = detailsHtml;
-
-  const fp = document.getElementById('hero-following');
-  if (following) {
-    const fr = routes[following.r];
-    fp.innerHTML = `<span class="hero-following-time">${busTimeAtStop(following)}</span> <span class="pill pill-sm ${fr.pill}"><span class="pill-dot"></span><span>${fr.code}</span></span>`;
-  } else {
-    fp.innerHTML = `<span class="hero-following-time">—</span>`;
+  // 5. Upcoming Departures Micro-Feed
+  const upChipsEl = document.getElementById('hero-upcoming-chips');
+  if (upChipsEl) {
+    if (upcoming && upcoming.length) {
+      upChipsEl.innerHTML = upcoming.map(u => {
+        const ur = routes[u.r];
+        const uAtStop = busMinAtStop(u);
+        const uDiff = tomorrow ? (1440 - cur + uAtStop) : (uAtStop - cur);
+        const uDiffStr = uDiff < 60 ? `через ${uDiff} хв` : `через ${Math.floor(uDiff/60)}г ${uDiff%60}хв`;
+        return `
+          <div class="hero-up-chip" onclick="scrollToTrip('${u.t}')">
+            <span class="pill pill-sm ${ur.pill}"><span class="pill-dot"></span><span>${ur.code}</span></span>
+            <span class="hero-up-time">${busTimeAtStop(u)}</span>
+            <span class="hero-up-rel">${uDiffStr}</span>
+          </div>
+        `;
+      }).join('');
+    } else {
+      upChipsEl.innerHTML = '<span style="font-size:11.5px;color:var(--text-tertiary);padding:4px 0;">Більше рейсів сьогодні немає</span>';
+    }
   }
 }
 
@@ -1755,6 +2131,9 @@ function renderBusRow(b, isPast, isCurrent, offset, dName, isAtDest) {
 
   const rep = getResolvedTripReport(curDir, b.t, b.r);
   const isCancelled = rep && rep.report_type === 'driver' && rep.status === 'cancelled';
+  const isDelayed = rep && (rep.status === 'delayed_10' || rep.status === 'delayed');
+  const delayMins = rep && rep.status === 'delayed_10' ? 10 : 4;
+  const delayedTime = toTime(toMin(timeAtStop) + delayMins);
 
   let subText = '';
   if (isCancelled) {
@@ -1762,16 +2141,16 @@ function renderBusRow(b, isPast, isCurrent, offset, dName, isAtDest) {
   } else if (rep && rep.report_type === 'driver' && rep.status === 'ok') {
     const timeStr = rep.created_at ? rep.created_at.slice(11, 16) : '';
     if (rep.stop_name && rep.stop_name !== 'base') {
-      subText = `Водій: проїхав ${rep.stop_name} ${timeStr ? '(' + timeStr + ')' : ''}`;
+      subText = `👨‍✈️ Водій: проїхав ${rep.stop_name} ${timeStr ? '(' + timeStr + ')' : ''}`;
     } else {
-      subText = 'Водій: на лінії';
+      subText = '👨‍✈️ Водій: на лінії за розкладом';
     }
   } else if (rep && rep.report_type === 'driver' && rep.status === 'delayed_10') {
-    subText = 'Водій: затримка ~10 хв';
+    subText = '👨‍✈️ Водій: затримка ~10 хв';
   } else if (rep && rep.report_type === 'passenger') {
-    if (rep.status === 'seen') subText = 'Пасажири бачили автобус';
-    else if (rep.status === 'delayed') subText = 'Затримка ~3 хв';
-    else if (rep.status === 'missing') subText = 'Очікують на зупинці';
+    if (rep.status === 'seen') subText = '👥 Пасажири бачили автобус';
+    else if (rep.status === 'delayed') subText = '👥 Повідомлено про затримку ~3 хв';
+    else if (rep.status === 'missing') subText = '👥 Очікують на зупинці';
   } else if (!isAtDest) {
     subText = `→ ${dName} ~${timeAtDest}`;
   } else {
@@ -1779,11 +2158,27 @@ function renderBusRow(b, isPast, isCurrent, offset, dName, isAtDest) {
     subText = `з ${startName} ${b.t}`;
   }
 
+  let timeHtml = `<span class="bus-time">${timeAtStop}</span>`;
+  if (isCancelled) {
+    timeHtml = `
+      <span class="bus-time" style="text-decoration:line-through;color:var(--red);">${timeAtStop}</span>
+      <span class="bus-cancelled-tag">Скасовано</span>
+    `;
+  } else if (isDelayed) {
+    timeHtml = `
+      <div class="bus-time-delayed-wrap">
+        <span class="bus-time-struck">${timeAtStop}</span>
+        <span class="bus-time-new">${delayedTime}</span>
+        <span class="bus-delay-tag">+${delayMins}хв</span>
+      </div>
+    `;
+  }
+
   return `
     <div class="bus-row ${isPast ? 'past' : ''} ${isCurrent ? 'current' : ''} ${isCancelled ? 'cancelled' : ''}">
       <div class="bus-left">
         <div class="bus-time-col">
-          <span class="bus-time">${timeAtStop}</span>
+          ${timeHtml}
           <span class="bus-subtime">${subText}</span>
         </div>
         <span class="pill ${r.pill}"><span class="pill-dot"></span><span>${r.code}</span></span>
@@ -2639,6 +3034,47 @@ function fallbackCopyText(text) {
   }
 }
 
+// ── Native Sheet Drag-Down Gesture ──
+function setupSheetDragGestures() {
+  document.querySelectorAll('.modal-sheet').forEach(sheet => {
+    let startY = 0;
+    let currentY = 0;
+
+    sheet.addEventListener('touchstart', (e) => {
+      if (sheet.scrollTop <= 0) {
+        startY = e.touches[0].clientY;
+      } else {
+        startY = 0;
+      }
+    }, { passive: true });
+
+    sheet.addEventListener('touchmove', (e) => {
+      if (startY > 0) {
+        currentY = e.touches[0].clientY;
+        const diff = currentY - startY;
+        if (diff > 0) {
+          sheet.style.transform = `translateY(${diff * 0.55}px)`;
+        }
+      }
+    }, { passive: true });
+
+    sheet.addEventListener('touchend', () => {
+      if (startY > 0 && currentY - startY > 65) {
+        const overlay = sheet.closest('.modal-overlay');
+        sheet.style.transform = '';
+        if (overlay) {
+          tgHaptic('light');
+          closeModal(overlay.id);
+        }
+      } else {
+        sheet.style.transform = '';
+      }
+      startY = 0;
+      currentY = 0;
+    }, { passive: true });
+  });
+}
+
 // ── Init ──
 setInterval(updateClock, 1000);
 setInterval(() => { updateHero(); renderSchedule(); }, 20000);
@@ -2648,16 +3084,36 @@ setDirection(curDir);
 fetchWeather();
 fetchLiveReports();
 applyDriverMode();
-window.addEventListener('resize', updateDockIndicator);
-window.addEventListener('load', () => { setTimeout(syncBottomBarState, 60); });
+setupSheetDragGestures();
+
+window.addEventListener('resize', () => {
+  updateDockIndicator();
+  updateDirIndicator();
+});
+
+window.addEventListener('load', () => {
+  setTimeout(() => {
+    syncBottomBarState();
+    updateDirIndicator();
+  }, 60);
+});
+
 document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape') {
     closeAllModals();
     syncBottomBarState();
   }
 });
-setTimeout(syncBottomBarState, 60);
-setTimeout(syncBottomBarState, 250);
+
+setTimeout(() => {
+  syncBottomBarState();
+  updateDirIndicator();
+}, 60);
+
+setTimeout(() => {
+  syncBottomBarState();
+  updateDirIndicator();
+}, 300);
 </script>
 
 </body>
