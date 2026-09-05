@@ -43,7 +43,7 @@ except Exception:
 BUS_TOKEN = os.getenv("PIDHORODNE_BOT_TOKEN", "8972553566:AAEvFKwONSaYRHdFvNa_oGxqBw1K29kQBmg")
 SERVER_URL = os.getenv("SERVER_URL", "https://avalonknight.pythonanywhere.com")
 WEBAPP_URL = f"{SERVER_URL.rstrip('/')}/bus"
-DRIVER_PIN = os.getenv("DRIVER_PIN", "2026")
+DRIVER_PIN = os.getenv("DRIVER_PIN", "4400")
 
 bot = telebot.TeleBot(BUS_TOKEN, threaded=False)
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -98,11 +98,36 @@ def init_db():
                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
                 )
             ''')
+            c.execute('''
+                CREATE TABLE IF NOT EXISTS drivers (
+                    telegram_id INTEGER PRIMARY KEY,
+                    name TEXT,
+                    registered_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                )
+            ''')
             conn.commit()
     except Exception as e:
         print(f"Error initializing DB: {e}", flush=True)
 
 init_db()
+
+def is_driver(telegram_id: int) -> bool:
+    try:
+        with sqlite3.connect(DB_PATH) as conn:
+            c = conn.cursor()
+            c.execute('SELECT 1 FROM drivers WHERE telegram_id = ?', (telegram_id,))
+            return c.fetchone() is not None
+    except Exception:
+        return False
+
+def add_driver(telegram_id: int, name: str = ""):
+    try:
+        with sqlite3.connect(DB_PATH) as conn:
+            c = conn.cursor()
+            c.execute('INSERT OR IGNORE INTO drivers (telegram_id, name) VALUES (?, ?)', (telegram_id, name))
+            conn.commit()
+    except Exception as e:
+        print(f"Error adding driver: {e}", flush=True)
 
 def parse_minutes(time_str: str) -> int:
     h, m = map(int, time_str.split(':'))
@@ -115,9 +140,10 @@ def minutes_to_str(m: int) -> str:
 def get_kyiv_now() -> datetime:
     return datetime.now(KYIV_TZ)
 
-def build_main_keyboard():
+def build_main_keyboard(is_drv: bool = False):
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=2)
     btn_webapp = types.KeyboardButton("🌐 Відкрити онлайн-розклад", web_app=types.WebAppInfo(url=WEBAPP_URL))
+    btn_driver_app = types.KeyboardButton("👨‍✈️ Пульт водія (Mini App)", web_app=types.WebAppInfo(url=f"{WEBAPP_URL}?driver={DRIVER_PIN}"))
     btn_zbruch = types.KeyboardButton("🏛️ Збруч (зараз)")
     btn_mcd = types.KeyboardButton("🍔 Від McDonald's (зараз)")
     btn_pidg = types.KeyboardButton("🏡 З Нижньої (зараз)")
@@ -126,6 +152,8 @@ def build_main_keyboard():
     btn_clean = types.KeyboardButton("🧹 Очистити кеш сайту")
     btn_warn = types.KeyboardButton("ℹ️ Маршрут і зупинки")
 
+    if is_drv:
+        markup.add(btn_driver_app)
     markup.add(btn_webapp)
     markup.add(btn_zbruch, btn_mcd)
     markup.add(btn_pidg)
@@ -135,6 +163,7 @@ def build_main_keyboard():
 
 @bot.message_handler(commands=['start', 'help'])
 def send_welcome(message):
+    is_drv = is_driver(message.chat.id)
     text = (
         "🚌 <b>Розклад автобусів: Підгородне ↔ Тернопіль</b>\n\n"
         "Маршрут проходить через ключові зупинки:\n"
@@ -144,27 +173,44 @@ def send_welcome(message):
         "• <b>Бережанська</b> (ЗУНУ, +8 хв)\n"
         "• <b>Підгородне (Нижня зупинка)</b> (+17 хв)\n\n"
         "<i>Міський маршрут №40 виключено з розкладу (курсує лише до кладовища).</i>\n\n"
-        "👨‍✈️ <i>Водії автобусів можуть скористатися командою /driver для статусу рейсів.</i>\n\n"
-        "Обирайте дію нижче або відкривайте веб-додаток 👇"
     )
+    if is_drv:
+        text += "👨‍✈️ <b>Ваш Telegram прив'язано як Водія!</b> Внизу доступна кнопка швидкого пульту керування рейсами.\n\n"
+    else:
+        text += "👨‍✈️ <i>Водії автобусів можуть скористатися командою /driver для авторизації.</i>\n\n"
+
+    text += "Обирайте дію нижче або відкривайте веб-додаток 👇"
+
     inline_markup = types.InlineKeyboardMarkup()
+    if is_drv:
+        inline_markup.add(types.InlineKeyboardButton("👨‍✈️ Відкрити пульт водія", web_app=types.WebAppInfo(url=f"{WEBAPP_URL}?driver={DRIVER_PIN}")))
     inline_markup.add(types.InlineKeyboardButton("📲 Відкрити веб-розклад", web_app=types.WebAppInfo(url=WEBAPP_URL)))
 
-    bot.send_message(message.chat.id, text, parse_mode="HTML", reply_markup=build_main_keyboard())
+    bot.send_message(message.chat.id, text, parse_mode="HTML", reply_markup=build_main_keyboard(is_drv))
     bot.send_message(message.chat.id, "✨ Інтерактивний таймер та відмітки:", reply_markup=inline_markup)
 
 @bot.message_handler(commands=['driver'])
 def driver_cmd(message):
     parts = message.text.strip().split()
+    chat_id = message.chat.id
     if len(parts) > 1 and parts[1] == DRIVER_PIN:
-        show_driver_menu(message.chat.id)
+        add_driver(chat_id, message.from_user.first_name or "Водій")
+        bot.send_message(
+            chat_id,
+            "🎉 <b>Успішно авторизовано як Водія!</b>\nВаш Telegram прив'язано до системи. Тепер у меню завжди є кнопка <b>«👨‍✈️ Пульт водія (Mini App)»</b>.",
+            parse_mode="HTML",
+            reply_markup=build_main_keyboard(True)
+        )
+        show_driver_menu(chat_id)
+    elif is_driver(chat_id):
+        show_driver_menu(chat_id)
     else:
         text = (
             "👨‍✈️ <b>Кабінет водія</b>\n\n"
-            "Введіть пін-код для доступу: <code>/driver 2026</code>\n"
-            "Або скористайтесь секретним веб-посиланням у кабінеті водія на сайті."
+            "Введіть пін-код для прив'язки вашого Telegram: <code>/driver 4400</code>\n"
+            "Після цього пульт водія завжди відкриватиметься в один клік без паролів."
         )
-        bot.send_message(message.chat.id, text, parse_mode="HTML")
+        bot.send_message(chat_id, text, parse_mode="HTML")
 
 def show_driver_menu(chat_id):
     now = get_kyiv_now()

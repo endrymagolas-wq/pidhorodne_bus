@@ -72,14 +72,30 @@
       font-variant-numeric: tabular-nums; padding-top: 2px;
     }
 
-    /* ── Driver Banner (if driver mode) ── */
+    /* ── Driver Cockpit Banner ── */
     .driver-banner {
       display: none; background: rgba(201, 180, 88, 0.15); border: 1.5px solid var(--yellow);
-      border-radius: var(--radius); padding: 10px 14px; margin-bottom: 12px;
-      font-size: 12.5px; color: var(--yellow);
+      border-radius: var(--radius); padding: 12px 14px; margin-bottom: 14px;
     }
     .driver-banner.active { display: block; }
-    .driver-banner-title { font-weight: 700; display: flex; justify-content: space-between; align-items: center; }
+    .driver-banner-header { display: flex; justify-content: space-between; align-items: center; }
+    .driver-banner-title { font-size: 14px; font-weight: 700; color: var(--yellow); }
+    .driver-route-select { display: flex; gap: 6px; margin: 10px 0 8px; overflow-x: auto; scrollbar-width: none; }
+    .driver-route-btn {
+      background: var(--surface-raised); border: 1px solid var(--border); color: var(--text);
+      padding: 6px 10px; border-radius: 8px; font-size: 12px; font-weight: 600; cursor: pointer; white-space: nowrap;
+    }
+    .driver-route-btn.active { border-color: var(--yellow); color: var(--yellow); background: rgba(201, 180, 88, 0.2); }
+    .driver-quick-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; margin-top: 10px; }
+    .driver-big-btn {
+      border: 1.5px solid var(--border); border-radius: 10px; padding: 12px 6px;
+      font-size: 12.5px; font-weight: 700; text-align: center; cursor: pointer;
+      display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;
+    }
+    .driver-big-btn:active { transform: scale(0.98); }
+    .btn-drv-ok { background: var(--green-soft); color: var(--green); border-color: rgba(124, 184, 122, 0.5); }
+    .btn-drv-delay { background: var(--yellow-soft); color: var(--yellow); border-color: rgba(201, 180, 88, 0.5); }
+    .btn-drv-cancel { background: var(--red-soft); color: var(--red); border-color: rgba(201, 113, 113, 0.5); }
 
     /* ── Direction Tabs ── */
     .dir-tabs { display: flex; gap: 8px; margin-bottom: 12px; }
@@ -156,6 +172,7 @@
     }
     .badge-driver-ok { background: var(--green-soft); color: var(--green); border: 1px solid rgba(124, 184, 122, 0.4); }
     .badge-driver-cancel { background: var(--red-soft); color: var(--red); border: 1px solid rgba(201, 113, 113, 0.4); }
+    .badge-driver-delay { background: var(--yellow-soft); color: var(--yellow); border: 1px solid rgba(201, 180, 88, 0.4); }
     .badge-seen { background: var(--green-soft); color: var(--green); border: 1px solid rgba(124, 184, 122, 0.4); }
     .badge-delayed { background: var(--yellow-soft); color: var(--yellow); border: 1px solid rgba(201, 180, 88, 0.4); }
     .badge-missing { background: var(--red-soft); color: var(--red); border: 1px solid rgba(201, 113, 113, 0.4); }
@@ -307,12 +324,12 @@
 
     .driver-pin-input {
       width: 100%; background: var(--surface-raised); border: 1px solid var(--border);
-      border-radius: 8px; color: var(--text); padding: 10px; font-size: 16px;
-      text-align: center; letter-spacing: 2px; margin-bottom: 12px;
+      border-radius: 8px; color: var(--text); padding: 10px; font-size: 18px;
+      text-align: center; letter-spacing: 4px; margin-bottom: 12px;
     }
     .btn-submit {
       width: 100%; background: var(--accent); color: #000; border: none;
-      border-radius: 8px; padding: 10px; font-weight: 700; cursor: pointer;
+      border-radius: 8px; padding: 12px; font-weight: 700; font-size: 14px; cursor: pointer;
     }
 
     ::-webkit-scrollbar { width: 0; height: 0; }
@@ -339,13 +356,31 @@
     <div class="clock" id="live-clock">--:--</div>
   </header>
 
-  <!-- Driver Panel Banner (If in driver mode) -->
+  <!-- Driver Cockpit Panel (If in driver mode) -->
   <div class="driver-banner" id="driver-banner">
-    <div class="driver-banner-title">
-      <span>👨‍✈️ Режим водія активовано</span>
-      <button onclick="exitDriverMode()" style="background:none;border:none;color:var(--text-secondary);cursor:pointer;">Вийти</button>
+    <div class="driver-banner-header">
+      <span class="driver-banner-title">👨‍✈️ Пульт водія (Швидке керування)</span>
+      <button onclick="exitDriverMode()" style="background:none;border:none;color:var(--text-secondary);cursor:pointer;font-size:12px;">Вийти</button>
     </div>
-    <p style="font-size:11.5px;margin-top:4px;">Натискайте кнопки під рейсом, щоб підтвердити виїзд або повідомити про скасування.</p>
+    <div style="font-size:12px;color:var(--text-secondary);margin-top:4px;">
+      Рейс: <strong id="drv-current-trip-label" style="color:var(--text);">--:--</strong>
+    </div>
+
+    <!-- 3 Big Buttons for Driver -->
+    <div class="driver-quick-grid">
+      <button class="driver-big-btn btn-drv-ok" onclick="submitDriverReport('ok')">
+        <span style="font-size:20px;">🟢</span>
+        <span>ВИЇЖДЖАЮ</span>
+      </button>
+      <button class="driver-big-btn btn-drv-delay" onclick="submitDriverReport('delayed_10')">
+        <span style="font-size:20px;">⏳</span>
+        <span>+5–10 ХВ</span>
+      </button>
+      <button class="driver-big-btn btn-drv-cancel" onclick="submitDriverReport('cancelled')">
+        <span style="font-size:20px;">❌</span>
+        <span>СКАСОВАНО</span>
+      </button>
+    </div>
   </div>
 
   <!-- Direction Tabs -->
@@ -400,16 +435,6 @@
     <div class="my-report-notice" id="my-report-notice">
       <span id="my-report-text">Ваш статус враховано</span>
       <button class="undo-btn" onclick="undoMyReport()">Скасувати</button>
-    </div>
-
-    <!-- Driver Actions (Only shown if isDriverMode) -->
-    <div class="next-card-actions" id="driver-actions" style="display:none;margin-top:6px;">
-      <button class="card-act-btn" style="color:var(--green);border-color:rgba(124,184,122,0.4);" onclick="submitDriverReport('ok')">
-        <span>🟢 Виїжджаю</span>
-      </button>
-      <button class="card-act-btn" style="color:var(--red);border-color:rgba(201,113,113,0.4);" onclick="submitDriverReport('cancelled')">
-        <span>❌ Скасовано</span>
-      </button>
     </div>
 
     <div class="next-card-footer" id="hero-footer">
@@ -508,7 +533,7 @@
       <ul>
         <li>Пасажири можуть відмітити: «Автобус прибув», «Затримується» або «Довго немає».</li>
         <li>Факт прибуття завжди скасовує будь-які скарги на затримку.</li>
-        <li>Офіційне скасування рейсу має право зробити лише водій автобуса.</li>
+        <li>Офіційне скасування рейсу має право зробити лише водій автобуса через свій пульт.</li>
       </ul>
     </div>
   </div>
@@ -518,15 +543,16 @@
 <div class="modal-overlay" id="driver-modal" onclick="closeOnBg(event, 'driver-modal')">
   <div class="modal-sheet">
     <div class="modal-top">
-      <h3>👨‍✈️ Вхід для водія</h3>
+      <h3>👨‍✈️ Авторизація водія</h3>
       <button class="modal-x" onclick="closeModal('driver-modal')">✕</button>
     </div>
     <div class="modal-body">
-      <p>Введіть пін-код для керування статусом рейсів:</p>
-      <input type="password" id="driver-pin-input" class="driver-pin-input" placeholder="ПІН-код" maxlength="8">
-      <button class="btn-submit" onclick="loginDriver()">Увійти</button>
-      <p style="font-size:11.5px;color:var(--text-tertiary);margin-top:10px;text-align:center;">
-        Також водії можуть керувати статусом через Telegram: команда <code>/driver 2026</code>
+      <p>Введіть PIN-код для входу в пульт водія:</p>
+      <input type="password" id="driver-pin-input" class="driver-pin-input" placeholder="4400" maxlength="4" inputmode="numeric">
+      <button class="btn-submit" onclick="loginDriver()">Увійти в пульт</button>
+      <p style="font-size:12px;color:var(--text-secondary);margin-top:14px;line-height:1.4;background:var(--surface-raised);padding:10px;border-radius:8px;">
+        💡 <b>Як прив'язати Telegram водія:</b><br>
+        Напишіть у боті команду <code>/driver 4400</code>. Після цього в меню з'явиться постійна кнопка <b>«👨‍✈️ Пульт водія»</b> і пароль більше ніколи вводити не доведеться!
       </p>
     </div>
   </div>
@@ -624,14 +650,16 @@ let curDir = 'to-pidg';
 let curFilter = 'all';
 let selectedStops = { 'to-pidg': 'mcdonalds', 'to-tern': 'nizhnya' };
 let liveReports = [];
-let isDriverMode = false;
-let driverPin = '';
+let isDriverMode = localStorage.getItem('isDriverMode') === 'true';
+let driverPin = localStorage.getItem('driverPin') || '';
 let myLastReportId = null;
 
 const urlParams = new URLSearchParams(window.location.search);
-if (urlParams.get('driver') === '2026') {
+if (urlParams.get('driver') === '4400' || urlParams.get('driver') === '2026') {
   isDriverMode = true;
-  driverPin = '2026';
+  driverPin = '4400';
+  localStorage.setItem('isDriverMode', 'true');
+  localStorage.setItem('driverPin', '4400');
 }
 
 // ── Helpers ──
@@ -701,21 +729,22 @@ async function fetchLiveReports() {
   } catch(e) {}
 }
 
-// Resolution logic: positive facts override complaints
 function getResolvedTripReport(dir, tripTime, routeType) {
   const matches = liveReports.filter(r => r.direction === dir && r.trip_time === tripTime && r.route_type === routeType);
   if (!matches.length) return null;
 
-  // 1. Driver report always takes top authority
   const driverRep = matches.find(r => r.report_type === 'driver');
   if (driverRep) return driverRep;
 
-  // 2. If any passenger marked 'seen', this OVERRIDES 'delayed' or 'missing'
   const seenRep = matches.find(r => r.report_type === 'passenger' && r.status === 'seen');
   if (seenRep) return seenRep;
 
-  // 3. Otherwise return the latest passenger observation
   return matches[0];
+}
+
+function isTripCancelled(dir, tripTime, routeType) {
+  const rep = getResolvedTripReport(dir, tripTime, routeType);
+  return rep && rep.report_type === 'driver' && rep.status === 'cancelled';
 }
 
 // ── Stop selector rendering ──
@@ -767,6 +796,7 @@ function getList() {
   return raw.filter(b => b.r === curFilter);
 }
 
+// Auto-skip cancelled trips in hero countdown for passengers
 function findNext() {
   const now = new Date();
   const cur = now.getHours()*60 + now.getMinutes();
@@ -774,17 +804,20 @@ function findNext() {
   const offset = getStopOffset();
   let next = null, following = null, tomorrow = false;
 
-  for (let i = 0; i < list.length; i++) {
-    const atStop = toMin(list[i].t) + offset;
+  const validTrips = isDriverMode ? list : list.filter(b => !isTripCancelled(curDir, b.t, b.r));
+  const pool = validTrips.length ? validTrips : list;
+
+  for (let i = 0; i < pool.length; i++) {
+    const atStop = toMin(pool[i].t) + offset;
     if (atStop >= cur) {
-      next = list[i];
-      following = list[i+1] || null;
+      next = pool[i];
+      following = pool[i+1] || null;
       break;
     }
   }
-  if (!next && list.length) {
-    next = list[0];
-    following = list[1] || null;
+  if (!next && pool.length) {
+    next = pool[0];
+    following = pool[1] || null;
     tomorrow = true;
   }
   return { next, following, tomorrow, cur };
@@ -807,6 +840,8 @@ function updateHeroStatus() {
       container.innerHTML = `<div class="status-badge badge-driver-ok">🟢 Водій підтвердив виїзд</div>`;
     } else if (rep.status === 'cancelled') {
       container.innerHTML = `<div class="status-badge badge-driver-cancel">❌ Водій: рейс скасовано</div>`;
+    } else if (rep.status === 'delayed_10') {
+      container.innerHTML = `<div class="status-badge badge-driver-delay">⏳ Водій: затримка +5–10 хв</div>`;
     }
   } else if (rep.report_type === 'passenger') {
     if (rep.status === 'seen') {
@@ -847,6 +882,10 @@ function updateHero() {
     <span>${r.name}</span>`;
 
   updateHeroStatus();
+
+  if (isDriverMode) {
+    document.getElementById('drv-current-trip-label').textContent = `${next.t} (${r.name})`;
+  }
 
   const details = document.getElementById('hero-details');
   const stops = stopsConfig[curDir];
@@ -925,7 +964,9 @@ function renderSchedule() {
       if (isCancelled) {
         subText = '❌ СКАСОВАНО ВОДІЄМ';
       } else if (rep && rep.report_type === 'driver' && rep.status === 'ok') {
-        subText = '🟢 Водій підтвердив';
+        subText = '🟢 Водій: виїхав';
+      } else if (rep && rep.report_type === 'driver' && rep.status === 'delayed_10') {
+        subText = '⏳ Водій: затримка +10хв';
       } else if (rep && rep.report_type === 'passenger') {
         if (rep.status === 'seen') subText = '🟢 Бачили пасажири';
         else if (rep.status === 'delayed') subText = '⏳ Затримка ~3 хв';
@@ -1081,41 +1122,44 @@ async function undoMyReport() {
   } catch(e) {}
 }
 
-// ── Driver Mode Functions ──
+// ── Driver Cockpit Logic ──
 function loginDriver() {
   const pin = document.getElementById('driver-pin-input').value.trim();
-  if (pin === '2026') {
+  if (pin === '4400' || pin === '2026') {
     isDriverMode = true;
     driverPin = pin;
+    localStorage.setItem('isDriverMode', 'true');
+    localStorage.setItem('driverPin', pin);
     closeModal('driver-modal');
     applyDriverMode();
-    alert('👨‍✈️ Режим водія активовано!');
+    alert('👨‍✈️ Авторизація успішна! Пульт водія активовано.');
   } else {
-    alert('Невірний ПІН-код!');
+    alert('Невірний PIN-код! Спробуйте ще раз.');
   }
 }
 
 function applyDriverMode() {
   if (isDriverMode) {
     document.getElementById('driver-banner').classList.add('active');
-    document.getElementById('driver-actions').style.display = 'flex';
   } else {
     document.getElementById('driver-banner').classList.remove('active');
-    document.getElementById('driver-actions').style.display = 'none';
   }
 }
 
 function exitDriverMode() {
   isDriverMode = false;
   driverPin = '';
+  localStorage.removeItem('isDriverMode');
+  localStorage.removeItem('driverPin');
   applyDriverMode();
+  updateAll();
 }
 
 async function submitDriverReport(statusVal) {
   const { next } = findNext();
   if (!next) return;
   const r = routes[next.r];
-  const label = statusVal === 'ok' ? 'підтвердити виїзд' : 'СКАСУВАТИ цей рейс';
+  const label = statusVal === 'ok' ? 'підтвердити виїзд' : (statusVal === 'cancelled' ? 'СКАСУВАТИ цей рейс' : 'попередити про затримку +10 хв');
 
   if (confirm(`Ви впевнені, що хочете ${label} (${next.t}, ${r.name})?`)) {
     try {
@@ -1123,7 +1167,7 @@ async function submitDriverReport(statusVal) {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          pin: driverPin,
+          pin: driverPin || '4400',
           direction: curDir,
           trip_time: next.t,
           route_type: next.r,
@@ -1132,7 +1176,7 @@ async function submitDriverReport(statusVal) {
       });
       const data = await res.json();
       if (data.ok) {
-        alert(statusVal === 'ok' ? '🟢 Виїзд підтверджено!' : '❌ Рейс позначено як скасований.');
+        alert('✅ Статус успішно оновлено! Пасажири вже бачать актуальну інформацію.');
         fetchLiveReports();
       } else {
         alert(`Помилка: ${data.error}`);
