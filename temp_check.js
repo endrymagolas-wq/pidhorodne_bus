@@ -290,6 +290,49 @@ function setFilter(f, el) {
   renderSchedule();
 }
 
+// в”Ђв”Ђ Collapsible Route Picker в”Ђв”Ђ
+const routePickerLabels = {
+  all: 'рџљЊ Р’СЃС– РјР°СЂС€СЂСѓС‚Рё',
+  pidg: 'рџџў РџС–РґРіРѕСЂРѕРґРЅРµ',
+  drag: 'рџ”µ Р”СЂР°РіР°РЅС–РІРєР°',
+  zab: 'рџџЎ Р—Р°Р±РѕР№РєРё',
+  dom: 'рџџЈ Р”РѕРјР°РјРѕСЂРёС‡'
+};
+
+let isRoutePickerOpen = false;
+function toggleRoutePicker() {
+  isRoutePickerOpen = !isRoutePickerOpen;
+  const toggle = document.getElementById('route-picker-toggle');
+  const dropdown = document.getElementById('route-picker-dropdown');
+  if (!toggle || !dropdown) return;
+  toggle.classList.toggle('open', isRoutePickerOpen);
+  dropdown.style.display = isRoutePickerOpen ? 'block' : 'none';
+  tgHaptic('selection');
+}
+
+function pickRoute(filter, el) {
+  curFilter = filter;
+  tgHaptic('impact_light');
+
+  // Update active state in dropdown
+  document.querySelectorAll('.route-pick-opt').forEach(o => o.classList.remove('active'));
+  if (el) el.classList.add('active');
+
+  // Update toggle label
+  const labelEl = document.getElementById('route-picker-label');
+  if (labelEl) labelEl.textContent = routePickerLabels[filter] || routePickerLabels.all;
+
+  // Auto-close
+  isRoutePickerOpen = false;
+  const toggle = document.getElementById('route-picker-toggle');
+  const dropdown = document.getElementById('route-picker-dropdown');
+  if (toggle) toggle.classList.remove('open');
+  if (dropdown) dropdown.style.display = 'none';
+
+  renderSchedule();
+  updateAll();
+}
+
 function updateClock() {
   const now = new Date();
   document.getElementById('live-clock').textContent =

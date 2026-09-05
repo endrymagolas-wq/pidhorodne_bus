@@ -459,9 +459,73 @@
       font-weight: 600;
     }
 
-    /* ── Compact Filters Row ── */
-    .compact-filters-row {
-      margin-bottom: 8px;
+    /* ── Collapsible Route Picker ── */
+    .route-picker {
+      margin-bottom: 10px;
+      position: relative;
+    }
+    .route-picker-toggle {
+      display: flex; align-items: center; justify-content: space-between;
+      width: 100%;
+      background: var(--surface); backdrop-filter: var(--glass-blur);
+      -webkit-backdrop-filter: var(--glass-blur);
+      border: 1px solid var(--border); border-radius: 12px;
+      padding: 10px 14px; font-size: 13px; font-weight: 700;
+      color: var(--text-warm); cursor: pointer;
+      transition: all var(--f2-duration-fast) var(--f2-curve-decelerate-mid);
+    }
+    .route-picker-toggle:active {
+      transform: scale(0.98);
+      background: var(--surface-raised);
+    }
+    .route-picker-toggle.open {
+      border-color: var(--accent);
+      border-bottom-left-radius: 0;
+      border-bottom-right-radius: 0;
+      border-bottom-color: transparent;
+    }
+    .route-picker-arrow {
+      font-size: 12px; color: var(--text-tertiary);
+      transition: transform 0.25s var(--f2-curve-spatial);
+    }
+    .route-picker-toggle.open .route-picker-arrow {
+      transform: rotate(180deg);
+    }
+    .route-picker-dropdown {
+      background: var(--surface); backdrop-filter: var(--glass-blur);
+      -webkit-backdrop-filter: var(--glass-blur);
+      border: 1px solid var(--accent); border-top: none;
+      border-radius: 0 0 12px 12px;
+      overflow: hidden;
+      animation: routeDropIn 0.2s var(--f2-curve-spatial);
+    }
+    @keyframes routeDropIn {
+      from { opacity: 0; transform: translateY(-6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .route-pick-opt {
+      display: flex; align-items: center; gap: 10px;
+      width: 100%; background: transparent; border: none;
+      padding: 11px 14px; font-size: 13px; font-weight: 600;
+      color: var(--text-secondary); cursor: pointer;
+      transition: background var(--f2-duration-fast) var(--f2-curve-decelerate-mid);
+      text-align: left;
+    }
+    .route-pick-opt:active {
+      background: var(--surface-raised);
+    }
+    .route-pick-opt + .route-pick-opt {
+      border-top: 1px solid rgba(255, 235, 220, 0.06);
+    }
+    .route-pick-opt.active {
+      color: var(--accent); font-weight: 700;
+      background: var(--accent-soft);
+    }
+    .route-pick-check {
+      display: none; font-size: 14px; font-weight: 800; color: var(--accent);
+    }
+    .route-pick-opt.active .route-pick-check {
+      display: inline;
     }
     .filter-section-label {
       font-size: 11px; font-weight: 700; color: var(--text-tertiary);
@@ -1359,14 +1423,28 @@
       </button>
     </div>
 
-    <!-- Compact Filters Row: Route + Stop in one line -->
-    <div class="compact-filters-row">
-      <div class="filters" id="route-filters" style="margin-bottom:0;">
-        <button class="chip active" onclick="setFilter('all', this)">Всі</button>
-        <button class="chip" onclick="setFilter('pidg', this)"><span class="route-badge-dot dot-pidg" style="width:7px;height:7px;"></span> Підгородне</button>
-        <button class="chip" onclick="setFilter('drag', this)"><span class="route-badge-dot dot-drag" style="width:7px;height:7px;"></span> Драганівка</button>
-        <button class="chip" onclick="setFilter('zab', this)"><span class="route-badge-dot dot-zab" style="width:7px;height:7px;"></span> Забойки</button>
-        <button class="chip" onclick="setFilter('dom', this)"><span class="route-badge-dot dot-dom" style="width:7px;height:7px;"></span> Домаморич</button>
+    <!-- Collapsible Route Picker -->
+    <div class="route-picker" id="route-picker">
+      <button class="route-picker-toggle" id="route-picker-toggle" onclick="toggleRoutePicker()">
+        <span class="route-picker-label" id="route-picker-label">🚌 Всі маршрути</span>
+        <span class="route-picker-arrow" id="route-picker-arrow">▾</span>
+      </button>
+      <div class="route-picker-dropdown" id="route-picker-dropdown" style="display:none;">
+        <button class="route-pick-opt active" data-filter="all" onclick="pickRoute('all', this)">
+          <span class="route-pick-check">✓</span> Всі маршрути
+        </button>
+        <button class="route-pick-opt" data-filter="pidg" onclick="pickRoute('pidg', this)">
+          <span class="route-badge-dot dot-pidg" style="width:8px;height:8px;"></span> Підгородне
+        </button>
+        <button class="route-pick-opt" data-filter="drag" onclick="pickRoute('drag', this)">
+          <span class="route-badge-dot dot-drag" style="width:8px;height:8px;"></span> Драганівка
+        </button>
+        <button class="route-pick-opt" data-filter="zab" onclick="pickRoute('zab', this)">
+          <span class="route-badge-dot dot-zab" style="width:8px;height:8px;"></span> Забойки
+        </button>
+        <button class="route-pick-opt" data-filter="dom" onclick="pickRoute('dom', this)">
+          <span class="route-badge-dot dot-dom" style="width:8px;height:8px;"></span> Домаморич
+        </button>
       </div>
     </div>
 
@@ -1948,6 +2026,49 @@ function setFilter(f, el) {
   document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
   if (el) el.classList.add('active');
   renderSchedule();
+}
+
+// ── Collapsible Route Picker ──
+const routePickerLabels = {
+  all: '🚌 Всі маршрути',
+  pidg: '🟢 Підгородне',
+  drag: '🔵 Драганівка',
+  zab: '🟡 Забойки',
+  dom: '🟣 Домаморич'
+};
+
+let isRoutePickerOpen = false;
+function toggleRoutePicker() {
+  isRoutePickerOpen = !isRoutePickerOpen;
+  const toggle = document.getElementById('route-picker-toggle');
+  const dropdown = document.getElementById('route-picker-dropdown');
+  if (!toggle || !dropdown) return;
+  toggle.classList.toggle('open', isRoutePickerOpen);
+  dropdown.style.display = isRoutePickerOpen ? 'block' : 'none';
+  tgHaptic('selection');
+}
+
+function pickRoute(filter, el) {
+  curFilter = filter;
+  tgHaptic('impact_light');
+
+  // Update active state in dropdown
+  document.querySelectorAll('.route-pick-opt').forEach(o => o.classList.remove('active'));
+  if (el) el.classList.add('active');
+
+  // Update toggle label
+  const labelEl = document.getElementById('route-picker-label');
+  if (labelEl) labelEl.textContent = routePickerLabels[filter] || routePickerLabels.all;
+
+  // Auto-close
+  isRoutePickerOpen = false;
+  const toggle = document.getElementById('route-picker-toggle');
+  const dropdown = document.getElementById('route-picker-dropdown');
+  if (toggle) toggle.classList.remove('open');
+  if (dropdown) dropdown.style.display = 'none';
+
+  renderSchedule();
+  updateAll();
 }
 
 function updateClock() {
