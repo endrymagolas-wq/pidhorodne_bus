@@ -754,16 +754,25 @@
     /* ── Modals ── */
     .modal-overlay {
       display: none; position: fixed; inset: 0;
-      background: rgba(0,0,0,0.7); backdrop-filter: blur(8px);
-      z-index: 200; align-items: flex-end; justify-content: center;
+      background: rgba(0,0,0,0.72); backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      z-index: 900; align-items: flex-end; justify-content: center;
     }
     .modal-overlay.open { display: flex; }
     .modal-sheet {
-      background: var(--surface-solid); border-top: 1px solid rgba(255, 255, 255, 0.15);
-      border-radius: 24px 24px 0 0;
-      padding: 20px 20px calc(env(safe-area-inset-bottom, 20px) + 16px);
+      background: var(--surface-solid); border-top: 1px solid rgba(255, 235, 220, 0.15);
+      border-left: 1px solid rgba(255, 235, 220, 0.08);
+      border-right: 1px solid rgba(255, 235, 220, 0.08);
+      border-radius: 28px 28px 0 0;
+      padding: 22px 20px calc(env(safe-area-inset-bottom, 20px) + 90px);
       max-width: 480px; width: 100%; max-height: 85vh; overflow-y: auto;
-      box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.6);
+      -webkit-overflow-scrolling: touch;
+      box-shadow: 0 -12px 48px rgba(0, 0, 0, 0.75);
+      animation: sheetSlideUp var(--f2-duration-gentle) var(--f2-curve-spatial) forwards;
+    }
+    @keyframes sheetSlideUp {
+      from { transform: translateY(28px); opacity: 0.6; }
+      to { transform: translateY(0); opacity: 1; }
     }
     .modal-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
     .modal-top h3 { font-size: 17px; font-weight: 800; letter-spacing: -0.2px; }
@@ -1173,7 +1182,7 @@
     </svg>
     <span>Водію</span>
   </button>
-  <button class="bar-btn" id="tab-nav-info" onclick="openModal('info-modal')" aria-label="Довідка">
+  <button class="bar-btn" id="tab-nav-info" onclick="navToInfo()" aria-label="Довідка">
     <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
       <circle cx="12" cy="12" r="10"></circle>
       <line x1="12" y1="16" x2="12" y2="12"></line>
@@ -1181,7 +1190,7 @@
     </svg>
     <span>Довідка</span>
   </button>
-  <button class="bar-btn" id="tab-nav-install" onclick="openModal('install-modal')" aria-label="Додаток">
+  <button class="bar-btn" id="tab-nav-install" onclick="navToInstall()" aria-label="Додаток">
     <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
       <rect x="5" y="2" width="14" height="20" rx="3" ry="3"></rect>
       <line x1="12" y1="18" x2="12.01" y2="18"></line>
@@ -2023,18 +2032,110 @@ function applyDriverMode() {
   syncBottomBarState();
 }
 
-function syncBottomBarState() {
-  const navSched = document.getElementById('tab-nav-schedule');
-  const navDrv = document.getElementById('tab-nav-driver');
-  if (!navSched || !navDrv) return;
+let currentActiveTab = 'tab-nav-schedule';
 
-  if (isDriverMode && driverViewMode === 'cockpit') {
-    navSched.classList.remove('active');
-    navDrv.classList.add('active');
-  } else {
-    navSched.classList.add('active');
-    navDrv.classList.remove('active');
+function closeAllModals() {
+  document.querySelectorAll('.modal-overlay').forEach(m => m.classList.remove('open'));
+}
+
+function openModal(id) {
+  // Always close other open modals to prevent layering/stacking conflicts
+  document.querySelectorAll('.modal-overlay').forEach(m => {
+    if (m.id !== id) m.classList.remove('open');
+  });
+  const el = document.getElementById(id);
+  if (el) {
+    el.classList.add('open');
+    const sheet = el.querySelector('.modal-sheet');
+    if (sheet) sheet.scrollTop = 0;
   }
+}
+
+function closeModal(id) {
+  const el = document.getElementById(id);
+  if (el) el.classList.remove('open');
+  syncBottomBarState();
+}
+
+function closeOnBg(e, id) {
+  if (e.target.id === id) {
+    closeModal(id);
+  }
+}
+
+function navToSchedule() {
+  closeAllModals();
+  if (isDriverMode && driverViewMode === 'cockpit') {
+    switchDriverView('passenger');
+  }
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  syncBottomBarState('tab-nav-schedule');
+}
+
+function handleDriverBarBtn() {
+  closeAllModals();
+  if (isDriverMode) {
+    switchDriverView('cockpit');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    syncBottomBarState('tab-nav-driver');
+  } else {
+    openModal('driver-modal');
+    syncBottomBarState('tab-nav-driver');
+  }
+}
+
+function navToInfo() {
+  const modal = document.getElementById('info-modal');
+  if (modal && modal.classList.contains('open')) {
+    closeModal('info-modal');
+    return;
+  }
+  openModal('info-modal');
+  syncBottomBarState('tab-nav-info');
+}
+
+function navToInstall() {
+  const modal = document.getElementById('install-modal');
+  if (modal && modal.classList.contains('open')) {
+    closeModal('install-modal');
+    return;
+  }
+  openModal('install-modal');
+  syncBottomBarState('tab-nav-install');
+}
+
+function syncBottomBarState(forceTabId = null) {
+  const allTabs = ['tab-nav-schedule', 'tab-nav-driver', 'tab-nav-info', 'tab-nav-install'];
+
+  if (forceTabId) {
+    currentActiveTab = forceTabId;
+  } else {
+    const openModalEl = document.querySelector('.modal-overlay.open');
+    if (openModalEl) {
+      if (openModalEl.id === 'info-modal') currentActiveTab = 'tab-nav-info';
+      else if (openModalEl.id === 'install-modal') currentActiveTab = 'tab-nav-install';
+      else if (openModalEl.id === 'driver-modal') currentActiveTab = 'tab-nav-driver';
+      else currentActiveTab = 'tab-nav-schedule';
+    } else {
+      if (isDriverMode && driverViewMode === 'cockpit') {
+        currentActiveTab = 'tab-nav-driver';
+      } else {
+        currentActiveTab = 'tab-nav-schedule';
+      }
+    }
+  }
+
+  allTabs.forEach(id => {
+    const btn = document.getElementById(id);
+    if (btn) {
+      if (id === currentActiveTab) {
+        btn.classList.add('active');
+      } else {
+        btn.classList.remove('active');
+      }
+    }
+  });
+
   updateDockIndicator();
 }
 
@@ -2063,23 +2164,6 @@ function exitDriverMode() {
   applyDriverMode();
   updateAll();
   syncBottomBarState();
-}
-
-function navToSchedule() {
-  if (isDriverMode && driverViewMode === 'cockpit') {
-    switchDriverView('passenger');
-  }
-  window.scrollTo({ top: 0, behavior: 'smooth' });
-  syncBottomBarState();
-}
-
-function handleDriverBarBtn() {
-  if (isDriverMode) {
-    switchDriverView('cockpit');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  } else {
-    openModal('driver-modal');
-  }
 }
 
 function switchDriverView(mode) {
@@ -2491,11 +2575,6 @@ async function resetDriverTripStops() {
 // ── Update all ──
 function updateAll() { updateClock(); updateHero(); renderSchedule(); }
 
-// ── Modals ──
-function openModal(id) { document.getElementById(id).classList.add('open'); }
-function closeModal(id) { document.getElementById(id).classList.remove('open'); }
-function closeOnBg(e, id) { if (e.target.id === id) closeModal(id); }
-
 // ── Cache clear ──
 function clearAppCache() {
   if (confirm("Очистити кеш та оновити розклад?")) {
@@ -2570,7 +2649,15 @@ fetchWeather();
 fetchLiveReports();
 applyDriverMode();
 window.addEventListener('resize', updateDockIndicator);
-setTimeout(updateDockIndicator, 60);
+window.addEventListener('load', () => { setTimeout(syncBottomBarState, 60); });
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') {
+    closeAllModals();
+    syncBottomBarState();
+  }
+});
+setTimeout(syncBottomBarState, 60);
+setTimeout(syncBottomBarState, 250);
 </script>
 
 </body>
