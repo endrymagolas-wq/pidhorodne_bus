@@ -399,6 +399,32 @@
       border-color: var(--accent); font-weight: 600;
     }
 
+    /* ── Past Trips Accordion ── */
+    .past-accordion { margin: 10px 0 14px; }
+    .past-accordion-btn {
+      width: 100%; background: var(--surface); border: 1px dashed var(--border);
+      border-radius: 10px; padding: 9px 12px; display: flex; justify-content: space-between;
+      align-items: center; cursor: pointer; color: var(--text-secondary);
+      font-size: 12.5px; font-weight: 600; transition: all 0.15s;
+    }
+    .past-accordion-btn:active { background: var(--surface-raised); }
+    .past-acc-badge {
+      background: var(--surface-raised); border: 1px solid var(--border);
+      padding: 1px 7px; border-radius: 10px; font-size: 11px; color: var(--text-tertiary);
+    }
+    .past-accordion-content {
+      margin-top: 8px; display: flex; flex-direction: column; gap: 6px;
+    }
+
+    /* ── Driver Passed Stops Accordion ── */
+    .drv-passed-accordion {
+      background: rgba(124, 184, 122, 0.1); border: 1px dashed rgba(124, 184, 122, 0.4);
+      border-radius: 10px; padding: 8px 12px; margin-bottom: 8px; display: flex;
+      justify-content: space-between; align-items: center; cursor: pointer;
+      font-size: 12px; font-weight: 600; color: var(--green);
+    }
+    .drv-passed-accordion:active { background: rgba(124, 184, 122, 0.18); }
+
     /* ── Period Labels ── */
     .period-label { font-size: 12.5px; font-weight: 600; color: var(--text-tertiary); margin: 20px 0 8px 2px; }
 
@@ -1181,18 +1207,71 @@ function updateHero() {
   }
 }
 
+let showPastTrips = false;
+
+function togglePastTrips() {
+  showPastTrips = !showPastTrips;
+  renderSchedule();
+}
+
+function renderBusRow(b, isPast, isCurrent, offset, dName, isAtDest) {
+  const r = routes[b.r];
+  const timeAtStop = busTimeAtStop(b);
+  const timeAtDest = busTimeAtDest(b);
+
+  const rep = getResolvedTripReport(curDir, b.t, b.r);
+  const isCancelled = rep && rep.report_type === 'driver' && rep.status === 'cancelled';
+
+  let subText = '';
+  if (isCancelled) {
+    subText = '❌ СКАСОВАНО ВОДІЄМ';
+  } else if (rep && rep.report_type === 'driver' && rep.status === 'ok') {
+    const timeStr = rep.created_at ? rep.created_at.slice(11, 16) : '';
+    if (rep.stop_name && rep.stop_name !== 'base') {
+      subText = `🟢 Водій: проїхав ${rep.stop_name} ${timeStr ? '(' + timeStr + ')' : ''}`;
+    } else {
+      subText = '🟢 Водій: виїхав';
+    }
+  } else if (rep && rep.report_type === 'driver' && rep.status === 'delayed_10') {
+    subText = '⏳ Водій: затримка ~10 хв';
+  } else if (rep && rep.report_type === 'passenger') {
+    if (rep.status === 'seen') subText = '🟢 Бачили пасажири';
+    else if (rep.status === 'delayed') subText = '⏳ Затримка ~3 хв';
+    else if (rep.status === 'missing') subText = '❓ Очікують автобус';
+  } else if (!isAtDest) {
+    subText = `→ ${dName} ~${timeAtDest}`;
+  } else {
+    const startName = curDir === 'to-pidg' ? 'АС-2' : 'Нижня';
+    subText = `з ${startName} ${b.t}`;
+  }
+
+  return `
+    <div class="bus-row ${isPast ? 'past' : ''} ${isCurrent ? 'current' : ''} ${isCancelled ? 'cancelled' : ''}">
+      <div class="bus-left">
+        <div class="bus-time-col">
+          <span class="bus-time">${timeAtStop}</span>
+          <span class="bus-subtime">${subText}</span>
+        </div>
+        <span class="pill ${r.pill}">${r.icon} ${r.code}</span>
+      </div>
+      <div class="bus-right">
+        <span class="bus-route-name">${r.name}</span>
+      </div>
+    </div>`;
+}
+
 // ── Schedule List ──
 function renderSchedule() {
   const container = document.getElementById('schedule-container');
   const list = getList();
   const { next, tomorrow, cur } = findNext();
   const offset = getStopOffset();
-  const dOff = destOffset[curDir];
   const dName = destName[curDir];
   const stopInfo = getStopInfo();
   const isAtDest = (curDir === 'to-pidg' && stopInfo.id === 'nizhnya') ||
                    (curDir === 'to-tern' && stopInfo.id === 'as2');
 
+  const pastItems = [];
   const periods = [
     { label: '🌅 Ранок', items: [] },
     { label: '☀️ День', items: [] },
@@ -1200,67 +1279,61 @@ function renderSchedule() {
   ];
 
   list.forEach(b => {
-    const m = toMin(b.t) + offset;
-    if (m < 720) periods[0].items.push(b);
-    else if (m < 990) periods[1].items.push(b);
-    else periods[2].items.push(b);
+    const atStop = toMin(b.t) + offset;
+    const isPast = !tomorrow && atStop < cur;
+    if (isPast) {
+      pastItems.push(b);
+    } else {
+      if (atStop < 720) periods[0].items.push(b);
+      else if (atStop < 990) periods[1].items.push(b);
+      else periods[2].items.push(b);
+    }
   });
 
   let html = '';
+
+  // 1. Collapsible Past Trips section
+  if (pastItems.length > 0) {
+    html += `
+      <div class="past-accordion">
+        <button class="past-accordion-btn" onclick="togglePastTrips()">
+          <span style="display:flex;align-items:center;gap:7px;">
+            <span>🕒</span>
+            <span>Минулі рейси сьогодні</span>
+            <span class="past-acc-badge">${pastItems.length}</span>
+          </span>
+          <span style="font-size:12px;color:var(--accent);font-weight:700;">
+            ${showPastTrips ? 'Приховати ▴' : 'Показати ▾'}
+          </span>
+        </button>
+        <div class="past-accordion-content" style="display: ${showPastTrips ? 'flex' : 'none'};">
+          ${pastItems.map(b => renderBusRow(b, true, false, offset, dName, isAtDest)).join('')}
+        </div>
+      </div>
+    `;
+  }
+
+  // 2. Active / Upcoming periods
   periods.forEach(p => {
     if (!p.items.length) return;
     html += `<div class="period-label">${p.label}</div><div class="bus-list">`;
 
     p.items.forEach(b => {
-      const r = routes[b.r];
-      const atStop = toMin(b.t) + offset;
-      const isPast = !tomorrow && atStop < cur;
-      const isCurrent = next && b.t === next.t && b.r === next.r && !isPast;
-      const timeAtStop = busTimeAtStop(b);
-      const timeAtDest = busTimeAtDest(b);
-
-      const rep = getResolvedTripReport(curDir, b.t, b.r);
-      const isCancelled = rep && rep.report_type === 'driver' && rep.status === 'cancelled';
-
-      let subText = '';
-      if (isCancelled) {
-        subText = '❌ СКАСОВАНО ВОДІЄМ';
-      } else if (rep && rep.report_type === 'driver' && rep.status === 'ok') {
-        const timeStr = rep.created_at ? rep.created_at.slice(11, 16) : '';
-        if (rep.stop_name && rep.stop_name !== 'base') {
-          subText = `🟢 Водій: проїхав ${rep.stop_name} ${timeStr ? '(' + timeStr + ')' : ''}`;
-        } else {
-          subText = '🟢 Водій: виїхав';
-        }
-      } else if (rep && rep.report_type === 'driver' && rep.status === 'delayed_10') {
-        subText = '⏳ Водій: затримка ~10 хв';
-      } else if (rep && rep.report_type === 'passenger') {
-        if (rep.status === 'seen') subText = '🟢 Бачили пасажири';
-        else if (rep.status === 'delayed') subText = '⏳ Затримка ~3 хв';
-        else if (rep.status === 'missing') subText = '❓ Очікують автобус';
-      } else if (!isAtDest) {
-        subText = `→ ${dName} ~${timeAtDest}`;
-      } else {
-        const startName = curDir === 'to-pidg' ? 'АС-2' : 'Нижня';
-        subText = `з ${startName} ${b.t}`;
-      }
-
-      html += `
-        <div class="bus-row ${isPast ? 'past' : ''} ${isCurrent ? 'current' : ''} ${isCancelled ? 'cancelled' : ''}">
-          <div class="bus-left">
-            <div class="bus-time-col">
-              <span class="bus-time">${timeAtStop}</span>
-              <span class="bus-subtime">${subText}</span>
-            </div>
-            <span class="pill ${r.pill}">${r.icon} ${r.code}</span>
-          </div>
-          <div class="bus-right">
-            <span class="bus-route-name">${r.name}</span>
-          </div>
-        </div>`;
+      const isCurrent = next && b.t === next.t && b.r === next.r && !tomorrow;
+      html += renderBusRow(b, false, isCurrent, offset, dName, isAtDest);
     });
     html += '</div>';
   });
+
+  // If tomorrow and periods are empty
+  if (tomorrow && periods.every(p => p.items.length === 0) && next) {
+    html += `
+      <div class="period-label">🌅 Завтра вранці</div>
+      <div class="bus-list">
+        ${renderBusRow(next, false, true, offset, dName, isAtDest)}
+      </div>
+    `;
+  }
 
   container.innerHTML = html;
 }
@@ -1394,6 +1467,12 @@ let driverViewMode = 'cockpit'; // 'cockpit' or 'passenger'
 let drvRoute = localStorage.getItem('drvRoute') || 'pidg';
 let drvDir = 'to-pidg';
 let drvSelectedTrip = null;
+let showDrvPassedStops = false;
+
+function toggleDrvPassedStops() {
+  showDrvPassedStops = !showDrvPassedStops;
+  renderDriverCockpit();
+}
 
 function loginDriver() {
   const pin = document.getElementById('driver-pin-input').value.trim();
@@ -1631,43 +1710,63 @@ function renderDriverCockpit() {
     }
   }
 
-  if (stepper) {
-    stepper.innerHTML = stops.map((s, idx) => {
-      const isPassed = Boolean(tripProg.passedMap[s.name]);
-      const isTarget = targetStop && s.id === targetStop.id;
-      const schedTime = toTime(baseMin + s.offset);
+  const passedStops = stops.filter(s => Boolean(tripProg.passedMap[s.name]));
+  const unpassedStops = stops.filter(s => !tripProg.passedMap[s.name]);
 
-      let itemClass = 'stepper-item';
-      let iconContent = `${idx + 1}`;
-      let badgeHtml = '';
+  function renderStopItem(s, idx) {
+    const isPassed = Boolean(tripProg.passedMap[s.name]);
+    const isTarget = targetStop && s.id === targetStop.id;
+    const schedTime = toTime(baseMin + s.offset);
 
-      if (isPassed) {
-        itemClass += ' passed';
-        iconContent = '✓';
-        badgeHtml = `<span class="stepper-badge sbadge-passed">✅ ${tripProg.passedMap[s.name]}</span>`;
-      } else if (isTarget) {
-        itemClass += ' current';
-        badgeHtml = `<span class="stepper-badge sbadge-target">👉 НАСТУПНА</span>`;
-      } else {
-        itemClass += ' upcoming';
-      }
+    let itemClass = 'stepper-item';
+    let iconContent = `${idx + 1}`;
+    let badgeHtml = '';
 
-      return `
-        <div class="${itemClass}" onclick="drvReportSpecificStop('${s.name}')" title="Натисніть для відмітки цієї зупинки">
-          <div class="stepper-icon-col">${iconContent}</div>
-          <div class="stepper-info">
-            <div class="stepper-name-row">
-              <span class="stepper-stop-name">${s.approx ? '~' : ''}${s.name}</span>
-              <div style="display:flex;align-items:center;">
-                <span class="stepper-time">~${schedTime}</span>
-                ${badgeHtml}
-              </div>
+    if (isPassed) {
+      itemClass += ' passed';
+      iconContent = '✓';
+      badgeHtml = `<span class="stepper-badge sbadge-passed">✅ ${tripProg.passedMap[s.name]}</span>`;
+    } else if (isTarget) {
+      itemClass += ' current';
+      badgeHtml = `<span class="stepper-badge sbadge-target">👉 НАСТУПНА</span>`;
+    } else {
+      itemClass += ' upcoming';
+    }
+
+    return `
+      <div class="${itemClass}" onclick="drvReportSpecificStop('${s.name}')" title="Натисніть для відмітки цієї зупинки">
+        <div class="stepper-icon-col">${iconContent}</div>
+        <div class="stepper-info">
+          <div class="stepper-name-row">
+            <span class="stepper-stop-name">${s.approx ? '~' : ''}${s.name}</span>
+            <div style="display:flex;align-items:center;">
+              <span class="stepper-time">~${schedTime}</span>
+              ${badgeHtml}
             </div>
-            <div class="stepper-sub">${s.sub}</div>
           </div>
+          <div class="stepper-sub">${s.sub}</div>
+        </div>
+      </div>
+    `;
+  }
+
+  if (stepper) {
+    let stepperHtml = '';
+    if (passedStops.length >= 2) {
+      stepperHtml += `
+        <div class="drv-passed-accordion" onclick="toggleDrvPassedStops()">
+          <span>✅ Пройдено ${passedStops.length} зупинок (${passedStops.map(s => s.name).join(' → ')})</span>
+          <span style="font-size:11.5px;color:var(--accent);font-weight:700;">${showDrvPassedStops ? 'Згорнути ▴' : 'Показати ▾'}</span>
         </div>
       `;
-    }).join('');
+      if (showDrvPassedStops) {
+        stepperHtml += passedStops.map((s, idx) => renderStopItem(s, idx)).join('');
+      }
+      stepperHtml += unpassedStops.map((s, idx) => renderStopItem(s, passedStops.length + idx)).join('');
+    } else {
+      stepperHtml = stops.map((s, idx) => renderStopItem(s, idx)).join('');
+    }
+    stepper.innerHTML = stepperHtml;
   }
 
   // 7. Giant Advance Button
