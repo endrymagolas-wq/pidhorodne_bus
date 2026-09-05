@@ -4,14 +4,17 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>Автобуси Підгородне</title>
-  <meta name="theme-color" content="#1a1a1a">
+  <meta name="theme-color" content="#100c0a">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Автобуси">
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
-  <link rel="manifest" href="manifest.json">
+  <link rel="manifest" href="/bus/manifest.json">
+  <link rel="apple-touch-icon" sizes="180x180" href="/bus/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="/bus/icon-192.png">
+  <link rel="icon" type="image/png" sizes="512x512" href="/bus/icon-512.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -794,11 +797,111 @@
     }
     .driver-pin-input:focus { outline: none; border-color: var(--accent); }
     .btn-submit {
-      width: 100%; background: var(--accent); color: #000; border: none;
+      width: 100%; background: var(--accent); color: #100c0a; border: none;
       border-radius: 12px; padding: 14px; font-weight: 800; font-size: 15px; cursor: pointer;
-      box-shadow: 0 4px 16px rgba(16, 185, 129, 0.35); transition: transform 0.1s;
+      box-shadow: 0 4px 16px rgba(226, 147, 66, 0.35); transition: transform 0.1s;
     }
     .btn-submit:active { transform: scale(0.98); }
+
+    /* ── PWA Installation Modal Styles ── */
+    .btn-pwa-install {
+      width: 100%;
+      background: var(--accent);
+      color: #100c0a;
+      border: none;
+      border-radius: 9999px;
+      padding: 12px 16px;
+      font-size: 13.5px;
+      font-weight: 800;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin-bottom: 12px;
+      box-shadow: 0 4px 18px rgba(226, 147, 66, 0.35);
+      transition: all var(--f2-duration-fast) var(--f2-curve-decelerate-mid);
+    }
+    .btn-pwa-install:active {
+      transform: scale(0.97);
+      transition: transform var(--f2-duration-fast) var(--f2-curve-easy-ease-max);
+    }
+    .install-link-box {
+      background: rgba(28, 22, 18, 0.65);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 12px;
+      margin-bottom: 12px;
+    }
+    .install-link-row {
+      display: flex;
+      gap: 6px;
+      margin-top: 6px;
+    }
+    .install-link-input {
+      flex: 1;
+      min-width: 0;
+      background: rgba(0, 0, 0, 0.35);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 8px 10px;
+      font-size: 12px;
+      color: var(--text-warm);
+      font-family: inherit;
+    }
+    .btn-copy-link {
+      background: rgba(226, 147, 66, 0.15);
+      color: var(--accent);
+      border: 1px solid rgba(226, 147, 66, 0.35);
+      border-radius: 10px;
+      padding: 8px 12px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      white-space: nowrap;
+      transition: all var(--f2-duration-fast);
+    }
+    .btn-copy-link:active {
+      transform: scale(0.96);
+      background: rgba(226, 147, 66, 0.25);
+    }
+    .install-steps-container {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .install-step-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 12px 14px;
+    }
+    .step-card-title {
+      font-size: 12.5px;
+      font-weight: 700;
+      color: var(--text-warm);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 6px;
+    }
+    .step-card-title svg {
+      color: var(--accent);
+      flex-shrink: 0;
+    }
+    .step-list {
+      padding-left: 18px;
+      font-size: 12px;
+      color: var(--text-secondary);
+      line-height: 1.45;
+      margin: 0;
+    }
+    .step-list li {
+      margin-bottom: 4px;
+    }
 
     ::-webkit-scrollbar { width: 0; height: 0; }
   </style>
@@ -831,7 +934,7 @@
         </svg>
       </span>
       <div class="title-group">
-        <h1>Підгородне <span class="route-arrow">↔</span> Тернопіль</h1>
+        <h1 id="brand-title-h1"><span id="header-origin">Тернопіль</span> <span class="route-arrow" id="header-arrow">→</span> <span id="header-dest">Підгородне</span></h1>
         <p id="header-sub">Розклад приміських автобусів</p>
       </div>
     </div>
@@ -1192,24 +1295,70 @@
   </div>
 </div>
 
-<!-- Install Modal -->
+<!-- Install Modal (PWA Installation Hub) -->
 <div class="modal-overlay" id="install-modal" onclick="closeOnBg(event, 'install-modal')">
   <div class="modal-sheet">
     <div class="modal-top">
-      <h3>Зберегти на телефон</h3>
+      <div style="display:flex;align-items:center;gap:12px;">
+        <img src="/bus/icon-192.png" alt="Іконка" style="width:38px;height:38px;border-radius:10px;border:1px solid rgba(226,147,66,0.35);box-shadow:0 4px 12px rgba(0,0,0,0.5);">
+        <div>
+          <h3 style="font-size:16px;line-height:1.2;">Встановити додаток</h3>
+          <span style="font-size:11px;color:var(--text-tertiary);">Миттєвий розклад на головному екрані</span>
+        </div>
+      </div>
       <button class="modal-x" onclick="closeModal('install-modal')">✕</button>
     </div>
     <div class="modal-body">
-      <p><strong>iPhone (Safari):</strong></p>
-      <ul>
-        <li>Натисни <strong>«Поділитися»</strong> (квадрат зі стрілкою).</li>
-        <li>Обери <strong>«На екран "Додому"»</strong>.</li>
-      </ul>
-      <p><strong>Android (Chrome):</strong></p>
-      <ul>
-        <li>Три крапки у правому верхньому куті.</li>
-        <li><strong>«Встановити додаток»</strong> або <strong>«Додати на головний екран»</strong>.</li>
-      </ul>
+      <!-- 1-Click Install Button (Android Chrome / Samsung Internet) -->
+      <button class="btn-pwa-install" id="btn-pwa-install" onclick="triggerPwaInstall()">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+        <span>Встановити додаток на телефон</span>
+      </button>
+
+      <!-- Direct Link Box -->
+      <div class="install-link-box">
+        <span style="font-size:11px;font-weight:700;color:var(--text-tertiary);text-transform:uppercase;letter-spacing:0.5px;">Пряме посилання на додаток:</span>
+        <div class="install-link-row">
+          <input type="text" id="pwa-direct-url" class="install-link-input" readonly value="https://avalonknight.pythonanywhere.com/bus">
+          <button class="btn-copy-link" id="btn-copy-link" onclick="copyDirectBusLink()">
+            <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+            <span id="btn-copy-link-text">Скопіювати</span>
+          </button>
+        </div>
+        <p style="font-size:11px;color:var(--accent);margin-top:8px;line-height:1.4;margin-bottom:0;">
+          💡 <b>Як відкрити:</b> Скопіюйте посилання та відкрийте його у браузері <b>Safari (на iPhone)</b> або <b>Chrome (на Android)</b>. У вікні Telegram збереження на екран не працює.
+        </p>
+      </div>
+
+      <!-- Step-by-Step Instructions -->
+      <div class="install-steps-container">
+        <!-- iPhone / Safari Guide -->
+        <div class="install-step-card">
+          <div class="step-card-title">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20.94c1.5 0 2.75 1.06 4 1.06 3 0 6-8 6-12.22A4.91 4.91 0 0 0 17 5c-2.22 0-4 1.44-5 2-1-.56-2.78-2-5-2a4.9 4.9 0 0 0-5 4.78C2 14 5 22 8 22c1.25 0 2.5-1.06 4-1.06Z"></path><path d="M10 2c1 .5 2 2 2 5"></path></svg>
+            <span>iPhone (браузер Safari):</span>
+          </div>
+          <ol class="step-list">
+            <li>Вставте посилання та відкрийте в <strong>Safari</strong>.</li>
+            <li>Натисніть кнопку <strong>«Поділитися»</strong> (квадрат зі стрілкою ⬆️ внизу).</li>
+            <li>Прокрутіть меню та оберіть <strong>«На початковий екран»</strong> (значок ➕).</li>
+            <li>Натисніть <strong>«Додати»</strong> у правому верхньому куті.</li>
+          </ol>
+        </div>
+
+        <!-- Android Guide -->
+        <div class="install-step-card">
+          <div class="step-card-title">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="3" ry="3"></rect><line x1="12" y1="18" x2="12.01" y2="18"></line></svg>
+            <span>Android (Google Chrome / Samsung Internet):</span>
+          </div>
+          <ol class="step-list">
+            <li>Натисніть кнопку <strong>«Встановити додаток на телефон»</strong> вище.</li>
+            <li>Або відкрийте в Chrome, натисніть три крапки <strong>⋮</strong> у кутку.</li>
+            <li>Оберіть <strong>«Встановити додаток»</strong> чи <strong>«Додати на головний екран»</strong>.</li>
+          </ol>
+        </div>
+      </div>
     </div>
   </div>
 </div>
@@ -1422,6 +1571,19 @@ function setDirection(dir) {
   curDir = dir;
   document.getElementById('btn-dir-to-pidg').classList.toggle('active', dir === 'to-pidg');
   document.getElementById('btn-dir-to-tern').classList.toggle('active', dir === 'to-tern');
+
+  const origEl = document.getElementById('header-origin');
+  const destEl = document.getElementById('header-dest');
+  if (origEl && destEl) {
+    if (dir === 'to-pidg') {
+      origEl.textContent = 'Тернопіль';
+      destEl.textContent = 'Підгородне';
+    } else {
+      origEl.textContent = 'Підгородне';
+      destEl.textContent = 'Тернопіль';
+    }
+  }
+
   renderStops();
   updateAll();
 }
@@ -2345,13 +2507,65 @@ function clearAppCache() {
   }
 }
 
+// ── PWA Installation Logic ──
+let deferredPrompt = null;
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+  const btn = document.getElementById('btn-pwa-install');
+  if (btn) btn.style.display = 'inline-flex';
+});
+
+async function triggerPwaInstall() {
+  if (deferredPrompt) {
+    deferredPrompt.prompt();
+    const { outcome } = await deferredPrompt.userChoice;
+    if (outcome === 'accepted') {
+      deferredPrompt = null;
+      const btn = document.getElementById('btn-pwa-install');
+      if (btn) btn.style.display = 'none';
+      closeModal('install-modal');
+    }
+  } else {
+    copyDirectBusLink();
+    alert('Посилання скопійовано! Відкрийте його у Safari (на iPhone) або Chrome (на Android), щоб зберегти додаток на робочий стіл.');
+  }
+}
+
+function copyDirectBusLink() {
+  const url = window.location.origin + '/bus';
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(url).then(() => {
+      const txt = document.getElementById('btn-copy-link-text');
+      if (txt) {
+        txt.textContent = 'Скопійовано!';
+        setTimeout(() => { txt.textContent = 'Скопіювати'; }, 2500);
+      }
+    }).catch(() => { fallbackCopyText(url); });
+  } else {
+    fallbackCopyText(url);
+  }
+}
+
+function fallbackCopyText(text) {
+  const inp = document.getElementById('pwa-direct-url');
+  if (inp) {
+    inp.select();
+    document.execCommand('copy');
+    const txt = document.getElementById('btn-copy-link-text');
+    if (txt) {
+      txt.textContent = 'Скопійовано!';
+      setTimeout(() => { txt.textContent = 'Скопіювати'; }, 2500);
+    }
+  }
+}
+
 // ── Init ──
 setInterval(updateClock, 1000);
 setInterval(() => { updateHero(); renderSchedule(); }, 20000);
 setInterval(fetchLiveReports, 20000);
 
-renderStops();
-updateAll();
+setDirection(curDir);
 fetchWeather();
 fetchLiveReports();
 applyDriverMode();
