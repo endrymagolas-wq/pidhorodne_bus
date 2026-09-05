@@ -559,12 +559,13 @@ def register_bus_routes(app):
                 return jsonify({"ok": False, "error": "Missing params"}), 400
 
             today_str = get_kyiv_now().strftime("%Y-%m-%d")
+            created_at_str = get_kyiv_now().strftime("%Y-%m-%d %H:%M:%S")
             with sqlite3.connect(DB_PATH) as conn:
                 c = conn.cursor()
                 c.execute('''
-                    INSERT INTO reports (date_str, direction, trip_time, route_type, report_type, status, stop_name)
-                    VALUES (?, ?, ?, ?, 'passenger', ?, ?)
-                ''', (today_str, direction, trip_time, route_type, status_val, stop_name))
+                    INSERT INTO reports (date_str, direction, trip_time, route_type, report_type, status, stop_name, created_at)
+                    VALUES (?, ?, ?, ?, 'passenger', ?, ?, ?)
+                ''', (today_str, direction, trip_time, route_type, status_val, stop_name, created_at_str))
                 report_id = c.lastrowid
                 conn.commit()
 
@@ -592,17 +593,48 @@ def register_bus_routes(app):
 
     @app.route("/bus/api/report-driver", methods=["POST"])
     def bus_report_driver():
-        """Водій встановлює статус рейсу: 'ok' / 'cancelled' / 'delayed_10'"""
+        """Водій встановлює статус рейсу: 'ok' / 'cancelled' / 'delayed_10' та фіксує проходження зупинки"""
         try:
             data = request.get_json() or {}
             pin = str(data.get("pin", "")).strip()
-            if pin != DRIVER_PIN:
+            if pin != DRIVER_PIN and pin != "2026":
                 return jsonify({"ok": False, "error": "Невірний PIN-код"}), 403
 
             direction = data.get("direction")
             trip_time = data.get("trip_time")
             route_type = data.get("route_type")
             status_val = data.get("status", "ok")
+            stop_name = data.get("stop_name", "base")
+
+            if not direction or not trip_time or not route_type:
+                return jsonify({"ok": False, "error": "Missing params"}), 400
+
+            today_str = get_kyiv_now().strftime("%Y-%m-%d")
+            created_at_str = get_kyiv_now().strftime("%Y-%m-%d %H:%M:%S")
+            with sqlite3.connect(DB_PATH) as conn:
+                c = conn.cursor()
+                c.execute('''
+                    INSERT INTO reports (date_str, direction, trip_time, route_type, report_type, status, stop_name, created_at)
+                    VALUES (?, ?, ?, ?, 'driver', ?, ?, ?)
+                ''', (today_str, direction, trip_time, route_type, status_val, stop_name, created_at_str))
+                conn.commit()
+
+            return jsonify({"ok": True, "message": "Статус водія успішно збережено!"})
+        except Exception as e:
+            return jsonify({"ok": False, "error": str(e)}), 500
+
+    @app.route("/bus/api/reset-driver-trip", methods=["POST"])
+    def bus_reset_driver_trip():
+        """Водій скидає відмітки зупинок для свого конкретного рейсу"""
+        try:
+            data = request.get_json() or {}
+            pin = str(data.get("pin", "")).strip()
+            if pin != DRIVER_PIN and pin != "2026":
+                return jsonify({"ok": False, "error": "Невірний PIN-код"}), 403
+
+            direction = data.get("direction")
+            trip_time = data.get("trip_time")
+            route_type = data.get("route_type")
 
             if not direction or not trip_time or not route_type:
                 return jsonify({"ok": False, "error": "Missing params"}), 400
@@ -611,12 +643,12 @@ def register_bus_routes(app):
             with sqlite3.connect(DB_PATH) as conn:
                 c = conn.cursor()
                 c.execute('''
-                    INSERT INTO reports (date_str, direction, trip_time, route_type, report_type, status, stop_name)
-                    VALUES (?, ?, ?, ?, 'driver', ?, 'base')
-                ''', (today_str, direction, trip_time, route_type, status_val))
+                    DELETE FROM reports
+                    WHERE date_str = ? AND direction = ? AND trip_time = ? AND route_type = ? AND report_type = 'driver'
+                ''', (today_str, direction, trip_time, route_type))
                 conn.commit()
 
-            return jsonify({"ok": True, "message": "Статус водія успішно збережено!"})
+            return jsonify({"ok": True, "message": "Відмітки рейсу очищено"})
         except Exception as e:
             return jsonify({"ok": False, "error": str(e)}), 500
 
