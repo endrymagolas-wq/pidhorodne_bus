@@ -151,12 +151,14 @@
     /* Live status badge */
     .status-badge {
       display: inline-flex; align-items: center; gap: 5px;
-      padding: 4px 9px; border-radius: 6px; font-size: 11.5px; font-weight: 600;
+      padding: 5px 10px; border-radius: 8px; font-size: 12px; font-weight: 600;
       margin-bottom: 10px; width: fit-content;
     }
     .badge-driver-ok { background: var(--green-soft); color: var(--green); border: 1px solid rgba(124, 184, 122, 0.4); }
     .badge-driver-cancel { background: var(--red-soft); color: var(--red); border: 1px solid rgba(201, 113, 113, 0.4); }
-    .badge-seen { background: var(--blue-soft); color: var(--blue); border: 1px solid rgba(107, 159, 206, 0.4); }
+    .badge-seen { background: var(--green-soft); color: var(--green); border: 1px solid rgba(124, 184, 122, 0.4); }
+    .badge-delayed { background: var(--yellow-soft); color: var(--yellow); border: 1px solid rgba(201, 180, 88, 0.4); }
+    .badge-missing { background: var(--red-soft); color: var(--red); border: 1px solid rgba(201, 113, 113, 0.4); }
 
     .next-card-details {
       background: var(--surface-raised); border-radius: 8px;
@@ -166,18 +168,29 @@
     .detail-row { display: flex; justify-content: space-between; align-items: center; }
     .detail-row strong { color: var(--text); font-weight: 600; }
 
-    /* Action Buttons row (Share, Calendar, Report) */
+    /* Action Buttons row (Status Report, Share, Calendar) */
     .next-card-actions {
       display: flex; gap: 6px; margin-top: 12px;
     }
     .card-act-btn {
       flex: 1; background: var(--surface-raised); border: 1px solid var(--border);
-      color: var(--text); border-radius: 8px; padding: 7px 8px; font-size: 11.5px;
+      color: var(--text); border-radius: 8px; padding: 8px 8px; font-size: 12px;
       font-weight: 600; cursor: pointer; display: inline-flex; align-items: center;
       justify-content: center; gap: 4px; transition: background 0.15s;
     }
     .card-act-btn:active { background: var(--border); }
-    .card-act-btn.highlight { border-color: var(--accent); color: var(--accent); }
+    .card-act-btn.highlight { border-color: var(--accent); color: var(--accent); background: var(--accent-soft); }
+
+    .my-report-notice {
+      display: none; background: var(--surface-raised); border: 1px dashed var(--border);
+      border-radius: 8px; padding: 7px 10px; margin-top: 8px; font-size: 11.5px;
+      color: var(--text-secondary); justify-content: space-between; align-items: center;
+    }
+    .my-report-notice.active { display: flex; }
+    .undo-btn {
+      background: none; border: none; color: var(--accent); font-size: 11.5px;
+      font-weight: 600; cursor: pointer; text-decoration: underline;
+    }
 
     .next-card-footer {
       margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border);
@@ -226,7 +239,6 @@
     .bus-subtime { font-size: 11px; color: var(--accent); font-weight: 500; }
     .bus-right { text-align: right; display: flex; flex-direction: column; align-items: flex-end; gap: 2px; }
     .bus-route-name { font-size: 12.5px; font-weight: 500; color: var(--text-secondary); }
-    .bus-status-tag { font-size: 10.5px; font-weight: 600; }
 
     /* ── Route Pills ── */
     .pill {
@@ -257,7 +269,7 @@
     .bar-btn:active { background: var(--surface-raised); }
     .bar-btn.danger { color: var(--red); border-color: rgba(201, 113, 113, 0.3); }
 
-    /* ── Modal ── */
+    /* ── Modals ── */
     .modal-overlay {
       display: none; position: fixed; inset: 0;
       background: rgba(0,0,0,0.6); backdrop-filter: blur(3px);
@@ -281,6 +293,17 @@
     .modal-body ul { margin-left: 18px; margin-bottom: 14px; color: var(--text-secondary); font-size: 13px; }
     .modal-body li { margin-bottom: 6px; }
     .modal-body strong { color: var(--text); }
+
+    /* Report modal options */
+    .report-options { display: flex; flex-direction: column; gap: 8px; margin-top: 12px; }
+    .report-opt-btn {
+      background: var(--surface-raised); border: 1.5px solid var(--border);
+      border-radius: 10px; padding: 12px 14px; text-align: left; cursor: pointer;
+      display: flex; align-items: center; gap: 12px; transition: border-color 0.15s;
+    }
+    .report-opt-btn:active { background: var(--border); }
+    .report-opt-title { font-size: 14px; font-weight: 700; color: var(--text); }
+    .report-opt-sub { font-size: 11.5px; color: var(--text-secondary); margin-top: 2px; }
 
     .driver-pin-input {
       width: 100%; background: var(--surface-raised); border: 1px solid var(--border);
@@ -360,10 +383,10 @@
 
     <div class="next-card-details" id="hero-details"></div>
 
-    <!-- Action Buttons (Share, Calendar, Report) -->
+    <!-- Action Buttons (Report status, Share, Calendar) -->
     <div class="next-card-actions" id="hero-actions">
-      <button class="card-act-btn highlight" onclick="reportSeenBus()">
-        <span>👀 Бачу автобус</span>
+      <button class="card-act-btn highlight" onclick="openModal('report-modal')">
+        <span>📢 Як автобус?</span>
       </button>
       <button class="card-act-btn" onclick="shareBusTrip()">
         <span>📤 Поділитися</span>
@@ -371,6 +394,12 @@
       <button class="card-act-btn" onclick="addTripToCalendar()">
         <span>📅 В календар</span>
       </button>
+    </div>
+
+    <!-- Undo personal report banner -->
+    <div class="my-report-notice" id="my-report-notice">
+      <span id="my-report-text">Ваш статус враховано</span>
+      <button class="undo-btn" onclick="undoMyReport()">Скасувати</button>
     </div>
 
     <!-- Driver Actions (Only shown if isDriverMode) -->
@@ -410,6 +439,49 @@
   <button class="bar-btn danger" onclick="clearAppCache()">🧹 Кеш</button>
 </div>
 
+<!-- Passenger Report Modal (Friendly crowd options) -->
+<div class="modal-overlay" id="report-modal" onclick="closeOnBg(event, 'report-modal')">
+  <div class="modal-sheet">
+    <div class="modal-top">
+      <h3>📢 Що зараз на зупинці?</h3>
+      <button class="modal-x" onclick="closeModal('report-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <p>Оберіть актуальний стан, щоб допомогти іншим пасажирам:</p>
+      
+      <div class="report-options">
+        <button class="report-opt-btn" style="border-color:rgba(124,184,122,0.4);" onclick="sendPassengerReport('seen')">
+          <span style="font-size:24px;">🟢</span>
+          <div>
+            <div class="report-opt-title">Автобус прибув / їде</div>
+            <div class="report-opt-sub">Автобус на лінії, все за розкладом</div>
+          </div>
+        </button>
+
+        <button class="report-opt-btn" style="border-color:rgba(201,180,88,0.4);" onclick="sendPassengerReport('delayed')">
+          <span style="font-size:24px;">⏳</span>
+          <div>
+            <div class="report-opt-title">Затримується на 2–5 хв</div>
+            <div class="report-opt-sub">Стою на зупинці, ще чекаємо</div>
+          </div>
+        </button>
+
+        <button class="report-opt-btn" style="border-color:rgba(201,113,113,0.4);" onclick="sendPassengerReport('missing')">
+          <span style="font-size:24px;">❓</span>
+          <div>
+            <div class="report-opt-title">Автобуса довго немає</div>
+            <div class="report-opt-sub">Час минув, на зупинці не з'явився</div>
+          </div>
+        </button>
+      </div>
+
+      <p style="font-size:11.5px;color:var(--text-tertiary);margin-top:12px;line-height:1.4;">
+        💡 <i>Якщо ви відмітите затримку, а автобус під'їде за хвилину — натисніть «Автобус прибув», і статус одразу зміниться на зелений!</i>
+      </p>
+    </div>
+  </div>
+</div>
+
 <!-- Info Modal -->
 <div class="modal-overlay" id="info-modal" onclick="closeOnBg(event, 'info-modal')">
   <div class="modal-sheet">
@@ -434,8 +506,9 @@
       </ul>
       <p><strong>Живі статуси та краудсорсинг:</strong></p>
       <ul>
-        <li>Якщо ви бачите, що автобус уже на зупинці — натисніть <strong>«👀 Бачу автобус»</strong>, і інші пасажири побачать живу відмітку.</li>
-        <li>Водії мають змогу підтвердити рейс або попередити про скасування через кабінет водія або в Telegram-боті.</li>
+        <li>Пасажири можуть відмітити: «Автобус прибув», «Затримується» або «Довго немає».</li>
+        <li>Факт прибуття завжди скасовує будь-які скарги на затримку.</li>
+        <li>Офіційне скасування рейсу має право зробити лише водій автобуса.</li>
       </ul>
     </div>
   </div>
@@ -553,8 +626,8 @@ let selectedStops = { 'to-pidg': 'mcdonalds', 'to-tern': 'nizhnya' };
 let liveReports = [];
 let isDriverMode = false;
 let driverPin = '';
+let myLastReportId = null;
 
-// Check URL params for driver mode
 const urlParams = new URLSearchParams(window.location.search);
 if (urlParams.get('driver') === '2026') {
   isDriverMode = true;
@@ -628,8 +701,21 @@ async function fetchLiveReports() {
   } catch(e) {}
 }
 
-function getTripReport(dir, tripTime, routeType) {
-  return liveReports.find(r => r.direction === dir && r.trip_time === tripTime && r.route_type === routeType);
+// Resolution logic: positive facts override complaints
+function getResolvedTripReport(dir, tripTime, routeType) {
+  const matches = liveReports.filter(r => r.direction === dir && r.trip_time === tripTime && r.route_type === routeType);
+  if (!matches.length) return null;
+
+  // 1. Driver report always takes top authority
+  const driverRep = matches.find(r => r.report_type === 'driver');
+  if (driverRep) return driverRep;
+
+  // 2. If any passenger marked 'seen', this OVERRIDES 'delayed' or 'missing'
+  const seenRep = matches.find(r => r.report_type === 'passenger' && r.status === 'seen');
+  if (seenRep) return seenRep;
+
+  // 3. Otherwise return the latest passenger observation
+  return matches[0];
 }
 
 // ── Stop selector rendering ──
@@ -710,7 +796,7 @@ function updateHeroStatus() {
   const { next } = findNext();
   if (!next) { container.innerHTML = ''; return; }
 
-  const rep = getTripReport(curDir, next.t, next.r);
+  const rep = getResolvedTripReport(curDir, next.t, next.r);
   if (!rep) {
     container.innerHTML = '';
     return;
@@ -723,7 +809,13 @@ function updateHeroStatus() {
       container.innerHTML = `<div class="status-badge badge-driver-cancel">❌ Водій: рейс скасовано</div>`;
     }
   } else if (rep.report_type === 'passenger') {
-    container.innerHTML = `<div class="status-badge badge-seen">👥 Пасажири бачили на зупинці</div>`;
+    if (rep.status === 'seen') {
+      container.innerHTML = `<div class="status-badge badge-seen">🟢 Пасажири бачили автобус (їде)</div>`;
+    } else if (rep.status === 'delayed') {
+      container.innerHTML = `<div class="status-badge badge-delayed">⏳ Пасажири повідомляють: затримка 2–5 хв</div>`;
+    } else if (rep.status === 'missing') {
+      container.innerHTML = `<div class="status-badge badge-missing">❓ На зупинці ще очікують автобус</div>`;
+    }
   }
 }
 
@@ -756,7 +848,6 @@ function updateHero() {
 
   updateHeroStatus();
 
-  // Details — show key stops
   const details = document.getElementById('hero-details');
   const stops = stopsConfig[curDir];
   const baseMin = toMin(next.t);
@@ -780,7 +871,6 @@ function updateHero() {
 
   details.innerHTML = detailsHtml;
 
-  // Following bus
   const fp = document.getElementById('hero-following');
   if (following) {
     const fr = routes[following.r];
@@ -828,16 +918,18 @@ function renderSchedule() {
       const timeAtStop = busTimeAtStop(b);
       const timeAtDest = busTimeAtDest(b);
 
-      const rep = getTripReport(curDir, b.t, b.r);
+      const rep = getResolvedTripReport(curDir, b.t, b.r);
       const isCancelled = rep && rep.report_type === 'driver' && rep.status === 'cancelled';
 
       let subText = '';
       if (isCancelled) {
         subText = '❌ СКАСОВАНО ВОДІЄМ';
       } else if (rep && rep.report_type === 'driver' && rep.status === 'ok') {
-        subText = '🟢 Підтверджено виїзд';
+        subText = '🟢 Водій підтвердив';
       } else if (rep && rep.report_type === 'passenger') {
-        subText = '👥 Бачили пасажири';
+        if (rep.status === 'seen') subText = '🟢 Бачили пасажири';
+        else if (rep.status === 'delayed') subText = '⏳ Затримка ~3 хв';
+        else if (rep.status === 'missing') subText = '❓ Очікують автобус';
       } else if (!isAtDest) {
         subText = `→ ${dName} ~${timeAtDest}`;
       } else {
@@ -883,7 +975,6 @@ async function shareBusTrip() {
       });
     } catch(e) {}
   } else {
-    // Fallback: copy to clipboard
     navigator.clipboard.writeText(shareText);
     alert('📋 Інформацію про рейс скопійовано в буфер обміну!');
   }
@@ -935,34 +1026,59 @@ function addTripToCalendar() {
   document.body.removeChild(link);
 }
 
-// ── Live Crowd Reporting (Passenger) ──
-async function reportSeenBus() {
+// ── Passenger Report Flow ──
+async function sendPassengerReport(statusVal) {
   const { next } = findNext();
   if (!next) return;
   const stopInfo = getStopInfo();
-  const r = routes[next.r];
+  closeModal('report-modal');
 
-  if (confirm(`Підтвердити, що автобус ${r.name} зараз на зупинці «${stopInfo.name}»?`)) {
-    try {
-      const res = await fetch('/bus/api/report-passenger', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          direction: curDir,
-          trip_time: next.t,
-          route_type: next.r,
-          stop_name: stopInfo.name
-        })
-      });
-      const data = await res.json();
-      if (data.ok) {
-        alert('✅ Дякуємо! Вашу відмітку додано в розклад.');
-        fetchLiveReports();
-      }
-    } catch(e) {
-      alert('Помилка відправки відмітки.');
+  try {
+    const res = await fetch('/bus/api/report-passenger', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        direction: curDir,
+        trip_time: next.t,
+        route_type: next.r,
+        status: statusVal,
+        stop_name: stopInfo.name
+      })
+    });
+    const data = await res.json();
+    if (data.ok) {
+      myLastReportId = data.report_id;
+      const statusLabels = {
+        'seen': 'Автобус прибув / їде',
+        'delayed': 'Затримка 2–5 хв',
+        'missing': 'Автобуса довго немає'
+      };
+
+      document.getElementById('my-report-text').textContent = `Ви вказали: «${statusLabels[statusVal]}»`;
+      document.getElementById('my-report-notice').classList.add('active');
+
+      fetchLiveReports();
     }
+  } catch(e) {
+    alert('Помилка надсилання.');
   }
+}
+
+async function undoMyReport() {
+  if (!myLastReportId) return;
+  try {
+    const res = await fetch('/bus/api/cancel-report', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ report_id: myLastReportId })
+    });
+    const data = await res.json();
+    if (data.ok) {
+      myLastReportId = null;
+      document.getElementById('my-report-notice').classList.remove('active');
+      fetchLiveReports();
+    }
+  } catch(e) {}
 }
 
 // ── Driver Mode Functions ──
@@ -1049,7 +1165,7 @@ function clearAppCache() {
 // ── Init ──
 setInterval(updateClock, 1000);
 setInterval(() => { updateHero(); renderSchedule(); }, 20000);
-setInterval(fetchLiveReports, 30000);
+setInterval(fetchLiveReports, 20000);
 
 renderStops();
 updateAll();

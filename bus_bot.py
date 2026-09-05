@@ -500,12 +500,13 @@ def register_bus_routes(app):
 
     @app.route("/bus/api/report-passenger", methods=["POST"])
     def bus_report_passenger():
-        """Пасажир відмічає: 'Автобус проїхав зупинку X'"""
+        """Пасажир відмічає статус: 'seen' (прибув/їде), 'delayed' (затримка 2-5 хв), 'missing' (немає/сумнів)"""
         try:
             data = request.get_json() or {}
             direction = data.get("direction")
             trip_time = data.get("trip_time")
             route_type = data.get("route_type")
+            status_val = data.get("status", "seen")
             stop_name = data.get("stop_name", "зупинку")
 
             if not direction or not trip_time or not route_type:
@@ -516,11 +517,30 @@ def register_bus_routes(app):
                 c = conn.cursor()
                 c.execute('''
                     INSERT INTO reports (date_str, direction, trip_time, route_type, report_type, status, stop_name)
-                    VALUES (?, ?, ?, ?, 'passenger', 'seen', ?)
-                ''', (today_str, direction, trip_time, route_type, stop_name))
+                    VALUES (?, ?, ?, ?, 'passenger', ?, ?)
+                ''', (today_str, direction, trip_time, route_type, status_val, stop_name))
+                report_id = c.lastrowid
                 conn.commit()
 
-            return jsonify({"ok": True, "message": "Дякуємо за відмітку!"})
+            return jsonify({"ok": True, "report_id": report_id, "message": "Дякуємо! Статус враховано."})
+        except Exception as e:
+            return jsonify({"ok": False, "error": str(e)}), 500
+
+    @app.route("/bus/api/cancel-report", methods=["POST"])
+    def bus_cancel_report():
+        """Скасування власного випадкового звіту пасажиром"""
+        try:
+            data = request.get_json() or {}
+            report_id = data.get("report_id")
+            if not report_id:
+                return jsonify({"ok": False, "error": "No report_id"}), 400
+
+            with sqlite3.connect(DB_PATH) as conn:
+                c = conn.cursor()
+                c.execute('DELETE FROM reports WHERE id = ?', (report_id,))
+                conn.commit()
+
+            return jsonify({"ok": True, "message": "Звіт скасовано"})
         except Exception as e:
             return jsonify({"ok": False, "error": str(e)}), 500
 
